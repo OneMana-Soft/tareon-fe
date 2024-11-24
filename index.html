@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
+  </head>
+  <body>
+  <script>
+    !function() {
+      try {
+        var d = document.documentElement
+                , c = d.classList;
+        c.remove('light', 'dark');
+        var e = localStorage.getItem('vite-ui-theme');
+        if ('system' === e || (!e && true)) {
+          var t = '(prefers-color-scheme: dark)'
+                  , m = window.matchMedia(t);
+          if (m.media !== t || m.matches) {
+            d.style.colorScheme = 'dark';
+            c.add('dark')
+          } else {
+            d.style.colorScheme = 'light';
+            c.add('light')
+          }
+        } else if (e) {
+          c.add(e || '')
+        }
+        if (e === 'light' || e === 'dark')
+          d.style.colorScheme = e
+      } catch (e) {}
+    }()
+  </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
