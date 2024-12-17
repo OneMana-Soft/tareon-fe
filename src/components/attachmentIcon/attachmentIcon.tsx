@@ -1,4 +1,3 @@
-import React from 'react';
 import { FileImage, FileText, FileAudio2, FileVideo, File} from 'lucide-react';
 
 type ConditionalIconProps = {

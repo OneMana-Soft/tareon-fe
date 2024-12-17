@@ -1,18 +1,3 @@
-// import PngFileIconReact from "../assets/file_png.svg"
-// import JpgFileIconReact from "../assets/file_jpg.svg?react"
-// import GifFileIconReact from "../assets/file_gif.svg?react"
-// import PdfFileIconReact from "../assets/file_pdf.svg?react"
-// import Mp3FileIconReact from "../assets/file_mp3.svg?react"
-// import GeneralFileIconReact from "../assets/file_general.svg?react"
-
-// import PngFileIcon from "../assets/file_png.svg"
-// import JpgFileIcon from "../assets/file_jpg.svg"
-// import GifFileIcon from "../assets/file_gif.svg"
-// import PdfFileIcon from "../assets/file_pdf.svg"
-// import Mp3FileIcon from "../assets/file_mp3.svg"
-// import GeneralFileIcon from "../assets/file_general.svg"
-import { FileImage } from "lucide-react";
-import {boolean} from "zod";
 
 export function formatDateForLatestPost(dateString: string | number): string {
   if (typeof dateString == "number") {
@@ -239,8 +224,8 @@ export function isDateEmptyOrInvalid(date: any): boolean {
 }
 
 
-export function getNameInitials(fullName: string): string {
-  const nameInitialsArray = fullName.split(" ") || [
+export function getNameInitials(fullName: string|undefined): string {
+  const nameInitialsArray = fullName?.split(" ") || [
     "Unknown",
   ];
 
@@ -279,9 +264,32 @@ export function formatDateForComment(dateString: string | number): string {
 }
 
 
-export function GetTaskStatusQueryParamByStatus(getAll: boolean, status: string, priorityFilter: string[], projectFilter: string[], pageSize: number = 0, pageIndex: number = 0): string {
-  const params = new URLSearchParams();
-  const queryString = [{"id":"task_status","value":[status]}]
+export function GetTaskStatusQueryParamByStatus({
+                                                  getAll = false,
+                                                  status = '',
+                                                  priorityFilter = [],
+                                                  projectFilter = [],
+                                                  pageSize = 0,
+                                                  pageIndex = 0,
+                                                  getOverdue = false,
+                                                  getUpcoming = false,
+                                                  searchText = '',
+                                                }: {
+  getAll?: boolean;
+  status?: string;
+  priorityFilter?: string[];
+  projectFilter?: string[];
+  pageSize?: number;
+  pageIndex?: number;
+  getOverdue?: boolean;
+  getUpcoming?: boolean;
+  searchText?: string;
+}): string {  const params = new URLSearchParams();
+  const queryString = []
+
+  if(status.length > 0 ){
+    queryString.push({"id":"task_status","value":[status]})
+  }
 
   if(priorityFilter.length > 0) {
     queryString.push({"id":"task_priority","value":priorityFilter})
@@ -290,12 +298,27 @@ export function GetTaskStatusQueryParamByStatus(getAll: boolean, status: string,
     queryString.push({"id":"task_project_name","value":projectFilter})
   }
 
+  if(getOverdue) {
+    queryString.push({"id":"overdue","value":'task'})
+  }
+
+  if(getUpcoming) {
+    queryString.push({"id":"upcoming","value":'task'})
+  }
+
   if(pageSize) {
     params.set('pageSize', pageSize.toString());
     params.set('pageIndex', pageIndex.toString());
   }
 
-  params.set('filters', JSON.stringify(queryString))
+  if(searchText) {
+    params.set('searchText', searchText);
+  }
+
+  if(queryString.length > 0 ) {
+    params.set('filters', JSON.stringify(queryString))
+
+  }
 
   if(getAll) {
     params.set('getAll', JSON.stringify(true));

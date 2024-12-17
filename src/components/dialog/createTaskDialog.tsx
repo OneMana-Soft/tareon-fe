@@ -1,18 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,9 +27,7 @@ import {
 } from "@/components/ui/command.tsx";
 import { format } from "date-fns";
 import { useState } from "react";
-import { TeamInfoInterface } from "@/services/TeamService.ts";
 import { UserProfileDataInterface } from "@/services/ProfileService.ts";
-import { Textarea } from "@/components/ui/textarea.tsx";
 import MinimalTiptapTask from "@/components/textInput/textInput.tsx";
 import { cn } from "@/lib/utils.ts";
 import { isDateEmptyOrInvalid } from "@/utils/Helper";
@@ -63,16 +54,15 @@ import mediaService, {
 import { Calendar } from "@/components/ui/calendar";
 import {
   Calendar as CalenderIcon,
-  FileImage,
-  Paperclip,
   X,
 } from "lucide-react";
 import AttachmentIcon from "@/components/attachmentIcon/attachmentIcon.tsx";
 import TaskService, { CreateTaskInterface } from "@/services/TaskService";
 import { priorities, prioritiesInterface } from "@/components/task/data";
-import {TOAST_TITLE_FAILURE, TOAST_TITLE_SUCCESS} from "@/constants/dailog/const.tsx";
+import {TOAST_UNKNOWN_ERROR} from "@/constants/dailog/const.tsx";
 import { useToast } from "@/hooks/use-toast.ts";
-import taskService from "@/services/TaskService";
+import {useTranslation} from "react-i18next";
+import {mutate} from "swr";
 
 
 interface createTaskDialogProps {
@@ -91,13 +81,14 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
   dialogOpenState,
   setOpenState,
 }) => {
-  const selfTask = taskService.getUserAssignedTaskList('')
 
   const [popOpenProjectName, setPopOpenProjectName] = useState(false);
 
   const [popOpenUserName, setPopOpenUserName] = useState(false);
 
   const [popOpenPriority, setPopOpenPriority] = useState(false);
+  const {t} = useTranslation()
+
 
   const [selectedProject, setSelectedProject] =
     useState<ProjectInfoInterface | null>(null);
@@ -287,23 +278,30 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
       createTaskConfig.task_start_date = startDate.toISOString();
     }
 
-    const res = await TaskService.createTask(createTaskConfig);
+    try {
+      await TaskService.createTask(createTaskConfig);
 
-    if (res.status != 200) {
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: "Failed to create new team",
+        title: t('success'),
+        description: t('createdNewTask'),
       });
 
-      return;
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : TOAST_UNKNOWN_ERROR;
+      toast({
+        title: t('failure'),
+        description: `${t('failedToCreateTask')}: ${errorMessage}`,
+      });
     }
 
-    toast({
-      title: TOAST_TITLE_SUCCESS,
-      description: "Created new team",
-    });
 
-   selfTask.mutate()
+    await mutate(
+        key => typeof key === 'string' && key.startsWith('/api/user/assignedTaskList')
+    )
+
+    await mutate(
+        key => typeof key === 'string' && key.startsWith(`/api/project/taskList/${dialogInputState.projectUUID}`)
+    )
 
     closeModal();
 
@@ -323,24 +321,24 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
       {/*</DialogTrigger>*/}
       <DialogContent className="sm:max-w-fit min-w-[50vw] min-h-[60vh]">
         <DialogHeader>
-          <DialogTitle>Create task</DialogTitle>
-          <DialogDescription>create task</DialogDescription>
+          <DialogTitle>{t('createTask')}</DialogTitle>
+          <DialogDescription>{t('createNewTask')}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2 mb-2">
-            <Label htmlFor="task_name">Task name:</Label>
+            <Label htmlFor="task_name">{t('taskName')}:</Label>
             <Input
               id="task_name"
               value={dialogInputState.taskName}
               onChange={handleTaskNameInputChange}
-              placeholder="Enter task name..."
+              placeholder={t('enterTaskName')}
               autoFocus
             />
           </div>
           <div className="grid gap-2 mb-2">
             {projectsInfo.projectData?.data && (
               <div className="flex items-center space-x-4">
-                <p className="text-sm">Project:</p>
+                <p className="text-sm">{t('project')}:</p>
                 <Popover
                   open={popOpenProjectName}
                   onOpenChange={setPopOpenProjectName}
@@ -354,7 +352,7 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
                           {" (" + selectedProject.project_team.team_name + ")"}
                         </>
                       ) : (
-                        <>select project</>
+                        <>{t('selectProject')}</>
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -362,7 +360,7 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
                     <Command>
                       <CommandInput placeholder="Select project..." />
                       <CommandList>
-                        <CommandEmpty>No results found.</CommandEmpty>
+                        <CommandEmpty>{t('noProjectFound')}</CommandEmpty>
                         <CommandGroup>
                           {projectsInfo.projectData?.data.map((project) => (
                             <CommandItem
@@ -377,14 +375,7 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
                                 setPopOpenProjectName(false);
                               }}
                             >
-                              {/*<status.icon*/}
-                              {/*    className={cn(*/}
-                              {/*        "mr-2 h-4 w-4",*/}
-                              {/*        status.value === selectedTeam?.value*/}
-                              {/*            ? "opacity-100"*/}
-                              {/*            : "opacity-40"*/}
-                              {/*    )}*/}
-                              {/*/>*/}
+
                               <span>
                                 {project.project_name}
                                 <span className="ml-2">
@@ -416,15 +407,15 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
                             {selectedUser.user_name}
                           </>
                         ) : (
-                          <>select member</>
+                          <>{t('selectMember')}</>
                         )}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="p-0" side="right" align="start">
                       <Command>
-                        <CommandInput placeholder="Select project..." />
+                        <CommandInput placeholder={t('selectProject')} />
                         <CommandList>
-                          <CommandEmpty>No results found.</CommandEmpty>
+                          <CommandEmpty>{t('noMemberFound')}</CommandEmpty>
                           <CommandGroup>
                             {selectedProject.project_members.map((member) => (
                               <CommandItem
@@ -459,7 +450,7 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
                   </Popover>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <p className="text-sm">Priority: </p>
+                  <p className="text-sm">{t('priority')}: </p>
                   <Popover
                     open={popOpenPriority}
                     onOpenChange={setPopOpenPriority}
@@ -474,15 +465,15 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
                             {selectedPriority.label}
                           </>
                         ) : (
-                          <>select priority</>
+                          <>{t('selectPriority')}</>
                         )}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="p-0" side="right" align="start">
                       <Command>
-                        <CommandInput placeholder="Select priority..." />
+                        <CommandInput placeholder={t('selectPriority')} />
                         <CommandList>
-                          <CommandEmpty>No results found.</CommandEmpty>
+                          <CommandEmpty>{t('"noPriorityFound')}</CommandEmpty>
                           <CommandGroup>
                             {priorities.map((member) => (
                               <CommandItem
@@ -518,12 +509,12 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
                   </Popover>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <Label htmlFor="task_label">Label:</Label>
+                  <Label htmlFor="task_label">{t('label')}:</Label>
                   <Input
                     id="task_label"
                     value={taskLabel}
                     onChange={handleLabelInputChange}
-                    placeholder="label..."
+                    placeholder={t('labelPlaceHolder')}
                     autoFocus
                   />
                 </div>
@@ -531,14 +522,14 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
             )}
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('description')}</Label>
             <MinimalTiptapTask
               throttleDelay={3000}
               className={cn("h-full min-h-0 w-full rounded-xl")}
               editorContentClassName="overflow-auto h-full"
               output="html"
               content={dialogInputState.taskDescription}
-              placeholder="Description..."
+              placeholder={t('descriptionPlaceholder')}
               editable={true}
               editorClassName="focus:outline-none px-5 py-4 h-full"
               onChange={(content: Content) => {
@@ -554,7 +545,7 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
         {selectedProject?.project_uuid && (
           <div>
             <Label htmlFor="file-upload" className="cursor-pointer">
-              Attach files
+              {t('attachFiles')}
             </Label>
 
             <Input
@@ -615,7 +606,7 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
                     {startDate ? (
                       format(startDate, "PPP")
                     ) : (
-                      <span>Start Date</span>
+                      <span>{t('startDate')}</span>
                     )}
                     <CalenderIcon className="ml-2 h-4 w-4" />
                   </Button>
@@ -651,7 +642,7 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
                       !dueDate && "text-muted-foreground"
                     )}
                   >
-                    {dueDate ? format(dueDate, "PPP") : <span>Due Date</span>}
+                    {dueDate ? format(dueDate, "PPP") : <span>{t('dueDate')}</span>}
                     <CalenderIcon className="ml-2 h-4 w-4" />
                   </Button>
                 </PopoverTrigger>
@@ -684,7 +675,7 @@ const CreateTaskDialog: React.FC<createTaskDialogProps> = ({
             onClick={handleCreateTask}
             disabled={disableButton}
           >
-            Create Task
+            {t('createTask')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -15,18 +15,20 @@ import {
     DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import taskService, {TaskInfoInterface} from "@/services/TaskService.ts";
-import {TOAST_TITLE_FAILURE, TOAST_TITLE_SUCCESS, TOAST_UNKNOWN_ERROR} from "@/constants/dailog/const.tsx";
+import {TOAST_UNKNOWN_ERROR} from "@/constants/dailog/const.tsx";
 import {useToast} from "@/hooks/use-toast.ts";
 import {mutate} from "swr";
 import {openCreateTaskPopup} from "@/store/slice/popupSlice.ts";
 import {CirclePlus} from "lucide-react";
 import {useDispatch} from "react-redux";
 import {KanbanProjectFilter} from "@/components/task/KanbanProjectFilter.tsx";
+import {useTranslation} from "react-i18next";
 
 
 export const MyTaskKanban = () => {
     const dispatch = useDispatch()
     const { toast } = useToast()
+    const {t} = useTranslation()
     const [activeProject, setActiveProject] = useState<string[]>([])
     const [viewableStatus, setViewableStatus] = useState({
         todo: true,
@@ -39,14 +41,12 @@ export const MyTaskKanban = () => {
         try {
             await taskService.updateTaskStatus({task_status: taskStatus, task_uuid: taskId, task_project_uuid: taskProjectUUID})
             toast({
-                title: TOAST_TITLE_SUCCESS,
-                description: "Updated task status",
+                title: t('success'),
+                description: t('updatedTaskStatus'),
             });
 
             await mutate(
-                key => typeof key === 'string' && key.startsWith('/api/user/assignedTaskList?filters='),
-                undefined,
-                { revalidate: true }
+                key => typeof key === 'string' && key.startsWith('/api/user/assignedTaskList?filters=')
             )
         } catch (e) {
 
@@ -55,8 +55,8 @@ export const MyTaskKanban = () => {
                 : TOAST_UNKNOWN_ERROR;
 
             toast({
-                title: TOAST_TITLE_FAILURE,
-                description: `Failed to update task start date: ${errorMessage}`,
+                title: t('failure'),
+                description: `${t('failedToUpdateTaskStatus')}: ${errorMessage}`,
                 variant: "destructive",
             })
 
@@ -94,7 +94,7 @@ export const MyTaskKanban = () => {
                         className="ml-auto hidden h-8 lg:flex"
                         onClick={()=>{dispatch(openCreateTaskPopup())}}
                     >
-                        <CirclePlus className='h-4 w-4'/>{" "}Create task
+                        <CirclePlus className='h-4 w-4'/>{" "}{t('createTask')}
                     </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -104,11 +104,11 @@ export const MyTaskKanban = () => {
                                 className="ml-auto hidden h-8 lg:flex"
                             >
                                 <MixerHorizontalIcon className="mr-2 h-4 w-4" />
-                                View
+                                {t('view')}
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[150px]">
-                            <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+                            <DropdownMenuLabel>{t('toggleColumns')}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             {statuses.map((column) => (
                                 <DropdownMenuCheckboxItem

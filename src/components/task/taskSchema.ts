@@ -1,6 +1,5 @@
 import { z } from "zod"
 
-
 export const taskSchema = z.object({
     task_uuid: z.string(),
     task_name: z.string(),

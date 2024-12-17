@@ -1,28 +1,18 @@
-import React, { useState } from "react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import {Check, ChevronDown, UserCircle, X} from "lucide-react"
-import { cn } from "@/lib/utils"
-import taskService, { CommentInfoInterface } from "@/services/TaskService"
-import profileService, { UserProfileDataInterface, UserProfileInterface } from "@/services/ProfileService"
+import {ChevronDown} from "lucide-react"
+import taskService from "@/services/TaskService"
 import mediaService, {AttachmentMediaReq} from "@/services/MediaService"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx"
-import { formatDateForComment, getNameInitials, isZeroEpoch } from "@/utils/Helper.ts"
-import { Content } from "@tiptap/core/dist/types"
-import MinimalTiptapTask from "@/components/textInput/textInput.tsx"
 import {
     DropdownMenu,
-    DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuTrigger
 } from "../ui/dropdown-menu"
 import { DropdownMenuContent } from "@/components/ui/dropdown-menu.tsx"
-import {TOAST_TITLE_FAILURE, TOAST_TITLE_SUCCESS, TOAST_UNKNOWN_ERROR} from "@/constants/dailog/const.tsx";
+import {TOAST_UNKNOWN_ERROR} from "@/constants/dailog/const.tsx";
 import {useToast} from "@/hooks/use-toast.ts";
 import AttachmentIcon from "@/components/attachmentIcon/attachmentIcon.tsx";
+import {useTranslation} from "react-i18next";
 
 interface TaskAttachmentProps {
     attachmentInfo: AttachmentMediaReq,
@@ -34,7 +24,8 @@ export default function TaskAttachment({ attachmentInfo, taskUUID, isAdmin}: Tas
     const [isDropdownOpen, setIsDropdownOpen] = useState(false) // Track dropdown state
 
     const taskInfo = taskService.getTaskInfo(taskUUID)
-    const mediaInfo = mediaService.getMediaURLForID(attachmentInfo.attachment_obj_key)
+    const mediaInfo = mediaService.getMediaURLForID(attachmentInfo.attachment_obj_key||'')
+    const {t} = useTranslation()
 
 
     const { toast } = useToast();
@@ -51,8 +42,8 @@ export default function TaskAttachment({ attachmentInfo, taskUUID, isAdmin}: Tas
             document.body.removeChild(link)
         } else {
             toast({
-                title: TOAST_TITLE_FAILURE,
-                description: "Download URL not available",
+                title: t('failure'),
+                description: t('downloadURLNotAvailable'),
                 variant: "destructive",
             })
         }
@@ -64,8 +55,8 @@ export default function TaskAttachment({ attachmentInfo, taskUUID, isAdmin}: Tas
 
             await taskService.deleteTaskAttachment(attachmentInfo.attachment_obj_key||'')
             toast({
-                title: TOAST_TITLE_SUCCESS,
-                description: `Updated task comment`,
+                title: t('success'),
+                description: t('deletedTaskAttachment'),
             })
 
             await taskInfo.mutate()
@@ -77,8 +68,8 @@ export default function TaskAttachment({ attachmentInfo, taskUUID, isAdmin}: Tas
                 : TOAST_UNKNOWN_ERROR;
 
             toast({
-                title: TOAST_TITLE_FAILURE,
-                description: `Failed to update task desc: ${errorMessage}`,
+                title: t('failure'),
+                description: `${t('failedToDeletedTaskAttachment')}: ${errorMessage}`,
                 variant: "destructive",
             })
 
@@ -99,7 +90,7 @@ export default function TaskAttachment({ attachmentInfo, taskUUID, isAdmin}: Tas
                     {attachmentInfo.attachment_file_name}
                 </div>
                 <a href={mediaInfo.mediaData?.url || ''} download={attachmentInfo.attachment_file_name} target='_blank' className='text-xs hover:underline'>
-                  Download
+                    {t('download')}
                 </a>
 
             </div>
@@ -121,11 +112,11 @@ export default function TaskAttachment({ attachmentInfo, taskUUID, isAdmin}: Tas
                     <DropdownMenuContent className="w-fit">
                         <DropdownMenuItem className='hover:cursor-pointer'
                                           onClick={handleDownload}>
-                            <span>Download</span>
+                            <span>{t('download')}</span>
                         </DropdownMenuItem>
 
                         <DropdownMenuItem className='hover:cursor-pointer' onClick={handleDelete}>
-                            <span>Delete</span>
+                            <span>{t('delete')}</span>
                         </DropdownMenuItem>
 
                     </DropdownMenuContent>

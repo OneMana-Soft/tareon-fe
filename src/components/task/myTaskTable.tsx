@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useState } from "react";
 import {
   ColumnFiltersState,
@@ -29,6 +27,8 @@ import { DataTableToolbar } from "@/components/task/taskTableToolbar";
 import taskService from "@/services/TaskService";
 import columns from "./taskColumns";
 import { useDebounce } from "@/hooks/use-debounce";
+import {LoaderCircle} from "lucide-react";
+import {useTranslation} from "react-i18next";
 
 export const MyTaskTable = () => {
   const [urlParam, setUrlParam] = useState('');
@@ -54,7 +54,9 @@ export const MyTaskTable = () => {
   );
 
   const data = taskData?.data.user_tasks || [];
-  const pageCount = taskData?.pageCount || -1;
+  const pageCount = taskData?.pageCount || 1;
+
+  const {t} = useTranslation()
 
   const table = useReactTable({
     data,
@@ -84,6 +86,7 @@ export const MyTaskTable = () => {
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+
 
   const getQueryStringFromState = useCallback(({ sorting, columnFilters, pageSize, pageIndex, taskSearchString }: {
     sorting: SortingState;
@@ -161,7 +164,9 @@ export const MyTaskTable = () => {
                         colSpan={columns.length}
                         className="h-24 text-center"
                     >
-                      {isLoading ? "Loading ..." : "No results."}
+                      {isLoading ?
+                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin"/>
+                          : t('noResultFound')}
                     </TableCell>
                   </TableRow>
               )}

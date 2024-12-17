@@ -9,6 +9,7 @@ import taskService from "@/services/TaskService"
 import profileService from "@/services/ProfileService"
 import mediaService from "@/services/MediaService"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip.tsx";
+import {useTranslation} from "react-i18next";
 
 interface SubTaskAssigneeProps {
     userUUID: string | undefined
@@ -18,6 +19,8 @@ interface SubTaskAssigneeProps {
 
 export default function SubTaskAssignee({ userUUID, taskUUID, assigneeUpdate }: SubTaskAssigneeProps) {
     const [assigneePopoverOpen, setAssigneePopoverOpen] = useState(false)
+    const {t} = useTranslation()
+
 
     const taskInfo = taskService.getTaskInfo(taskUUID)
     const userProfile = profileService.getUserProfileForID(userUUID || '')
@@ -55,14 +58,14 @@ export default function SubTaskAssignee({ userUUID, taskUUID, assigneeUpdate }: 
 
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Assignee</p>
+                    <p>{t('assignee')}</p>
                 </TooltipContent>
             </Tooltip>
             <PopoverContent className="w-[200px] p-0">
                 <Command>
-                    <CommandInput placeholder="Search member..." />
+                    <CommandInput placeholder={t('searchMemberPlaceholder')}/>
                     <CommandList>
-                        <CommandEmpty>No member found.</CommandEmpty>
+                        <CommandEmpty>{t('noMemberFound')}</CommandEmpty>
                         <CommandGroup>
                             {taskInfo.taskData?.data.task_project.project_members.map((member) => (
                                 <CommandItem

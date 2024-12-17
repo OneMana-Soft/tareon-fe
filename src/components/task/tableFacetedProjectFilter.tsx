@@ -1,4 +1,3 @@
-import * as React from "react";
 import { CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { Column } from "@tanstack/react-table";
 
@@ -21,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import profileService from "@/services/ProfileService.ts";
+import {useTranslation} from "react-i18next";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
@@ -33,9 +33,9 @@ export function DataTableFacetedProjectFilter<TData, TValue>({
   title,
 
 }: DataTableFacetedFilterProps<TData, TValue>) {
-  const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
   const selfUserProfile = profileService.getSelfUserProfile()
+  const {t} = useTranslation()
 
   return (
     <Popover>
@@ -58,7 +58,7 @@ export function DataTableFacetedProjectFilter<TData, TValue>({
                     variant="secondary"
                     className="rounded-sm px-1 font-normal"
                   >
-                    {selectedValues.size} selected
+                    {selectedValues.size} {t('selected          ')}
                   </Badge>
                 ) : selfUserProfile.userData?.data.user_projects && (
                      selfUserProfile.userData?.data.user_projects
@@ -82,7 +82,7 @@ export function DataTableFacetedProjectFilter<TData, TValue>({
         <Command>
           <CommandInput placeholder={title} />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>{t('noResultFound')}</CommandEmpty>
             <CommandGroup>
               {selfUserProfile.userData?.data.user_projects && selfUserProfile.userData?.data.user_projects.map((option) => {
                 const isSelected = selectedValues.has(option.uid);
@@ -132,7 +132,7 @@ export function DataTableFacetedProjectFilter<TData, TValue>({
                     onSelect={() => column?.setFilterValue(undefined)}
                     className="justify-center text-center"
                   >
-                    Clear filters
+                    {t('clearFilters')}
                   </CommandItem>
                 </CommandGroup>
               </>

@@ -1,6 +1,6 @@
-import React, { useState } from "react"
 import mediaService, {AttachmentMediaReq} from "@/services/MediaService"
 import AttachmentIcon from "@/components/attachmentIcon/attachmentIcon.tsx";
+import {useTranslation} from "react-i18next";
 
 interface TaskCommentAttachmentProps {
     attachmentInfo: AttachmentMediaReq,
@@ -9,8 +9,8 @@ interface TaskCommentAttachmentProps {
 }
 
 export default function TaskCommentAttachment({ attachmentInfo}: TaskCommentAttachmentProps) {
-
-    const mediaInfo = mediaService.getMediaURLForID(attachmentInfo.attachment_obj_key)
+    const {t} = useTranslation()
+    const mediaInfo = mediaService.getMediaURLForID(attachmentInfo.attachment_obj_key||'')
 
     return (
         <div
@@ -24,7 +24,7 @@ export default function TaskCommentAttachment({ attachmentInfo}: TaskCommentAtta
                     {attachmentInfo.attachment_file_name}
                 </div>
                 <a href={mediaInfo.mediaData?.url || ''} download={attachmentInfo.attachment_file_name} target='_blank' className='text-xs hover:underline'>
-                  Download
+                    {t('download')}
                 </a>
 
             </div>

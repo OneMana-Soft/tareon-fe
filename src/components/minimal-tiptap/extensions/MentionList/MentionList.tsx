@@ -171,7 +171,7 @@ const MentionList = forwardRef<MentionRef, MentionProps>((props, ref) => {
 
 
     return props.items.length > 0 ? (
-        <div className="items mentions-list border bg-background text-foreground ">
+        <div className="items mentions-list border bg-background text-foreground w-fit">
             {props.items.map((item, index) => (
 
                 <MentionMember

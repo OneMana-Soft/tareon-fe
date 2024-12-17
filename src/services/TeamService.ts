@@ -1,18 +1,5 @@
-// Uid       string           `json:"uid,omitempty"`
-// DType     []string         `json:"dgraph.type,omitempty"`
-// Uuid      string           `json:"team_uuid,omitempty"`
-// Projects  []*DgraphProject `json:"team_projects,omitempty"`
-// Name      string           `json:"team_name,omitempty"`
-// Members   []*DgraphUser    `json:"team_members,omitempty"`
-// Admins    []*DgraphUser    `json:"team_admins,omitempty"`
-// CreatedBy *DgraphUser      `json:"team_created_by,omitempty"`
-// CreatedAt *time.Time       `json:"team_created_at,omitempty"`
-// UpdatedAt *time.Time       `json:"team_updated_at,omitempty"`
-// DeletedAt *time.Time       `json:"team_deleted_at,omitempty"`
-
 import {
   UserProfileDataInterface,
-  UserProfileInterface,
 } from "@/services/ProfileService.ts";
 import axiosInstance from "@/utils/AxiosInstance.ts";
 import useSWR from "swr";
@@ -23,6 +10,8 @@ export interface TeamInfoInterface {
   team_uuid: string;
   team_name: string;
   team_projects: ProjectInfoInterface[];
+  team_is_admin: boolean;
+  team_is_member: boolean;
   team_members: UserProfileDataInterface[];
   team_admins: UserProfileDataInterface[];
   team_created_by: UserProfileDataInterface;
@@ -34,6 +23,7 @@ export interface TeamInfoInterface {
 interface CreateOrUpdateTeamInfo {
   team_name?: string;
   team_uuid?: string;
+  member_uuid?: string;
 }
 
 export interface TeamInfoRawInterface {
@@ -63,17 +53,46 @@ class TeamService {
     return fetcher;
   }
 
-  static getTeamInfo() {
+  static getTeamProjectListInfo(id: string) {
     const { data, error, isLoading, mutate } = useSWR(
-      `/api/teamInfo`,
-      TeamService.getTeamFetcher
-    );
+        (id !='' ? `/api/team/projectList/${id}` : null),
+        TeamService.getTeamFetcher
+    )
 
     return {
-      userData: data,
+      teamData: data,
       isLoading,
       isError: error,
       userMutate: mutate,
+    };
+  }
+
+  static getTeamMemberListInfo(id: string) {
+    const { data, error, isLoading, mutate } = useSWR(
+        (id !='' ? `/api/team/membersInfo/${id}` : null),
+        TeamService.getTeamFetcher
+    )
+
+    return {
+      teamData: data,
+      isLoading,
+      isError: error,
+      userMutate: mutate,
+    };
+  }
+
+
+  static getTeamInfo(id: string) {
+    const { data, error, isLoading, mutate } = useSWR(
+        (id !='' ? `/api/team/info/${id}` : null),
+      TeamService.getTeamFetcher
+    )
+
+    return {
+      teamData: data,
+      isLoading,
+      isError: error,
+      Mutate: mutate,
     };
   }
 
@@ -96,6 +115,37 @@ class TeamService {
       .post("/api/team/createTeam", createTeamBody)
       .then((res) => res);
   }
+
+  static addTeamMember(createTeamBody: CreateOrUpdateTeamInfo) {
+    return axiosInstance
+        .post("/api/team/addMember", createTeamBody)
+        .then((res) => res);
+  }
+
+  static addAdminTeamMember(createTeamBody: CreateOrUpdateTeamInfo) {
+    return axiosInstance
+        .post("/api/team/addAdminRole", createTeamBody)
+        .then((res) => res);
+  }
+
+  static removeAdminRole(teamId: string, userId: string) {
+    return axiosInstance
+        .delete(`/api/team/removeAdminRole/${teamId}/${userId}`)
+        .then((res) => res);
+  }
+
+  static removeMember(teamId: string, userId: string) {
+    return axiosInstance
+        .delete(`/api/team/removeMember/${teamId}/${userId}`)
+        .then((res) => res);
+  }
+
+  static updateTeamName(createTeamBody: CreateOrUpdateTeamInfo) {
+    return axiosInstance
+        .put("/api/team/updateName", createTeamBody)
+        .then((res) => res);
+  }
+
 }
 
 export default TeamService;

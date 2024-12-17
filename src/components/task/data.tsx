@@ -79,7 +79,7 @@ export const priorities = [
   },
 ];
 
-export type ColumnId = 'task_name' | 'task_status' | 'task_priority' | 'task_project_name' | 'task_start_date' | 'task_due_date';
+export type ColumnId = 'task_name' | 'task_status' | 'task_priority' | 'task_project_name' | 'task_start_date' | 'task_due_date' | 'task_created_at' | 'task_assignee_name';
 
 // Step 2: Type the colName object using Record
 export const colName: Record<ColumnId, string> = {
@@ -89,6 +89,8 @@ export const colName: Record<ColumnId, string> = {
   task_project_name: "project",
   task_start_date: "start date",
   task_due_date: "due date",
+  task_created_at: "created at",
+  task_assignee_name: "assignee"
 };
 
 

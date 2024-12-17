@@ -3,16 +3,16 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-
 import { priorities, statuses } from "./data";
-import { Task } from "@/components/task/taskSchema.ts"
 import { DataTableColumnHeader } from "./taskTableColumnHeader.tsx";
 import  store  from '@/store/store.ts'
 import {openSideBarTaskInfo} from "@/store/slice/popupSlice.ts";
 import {isZeroEpoch} from "@/utils/Helper.ts";
 import {format} from "date-fns";
-import {GitBranch, MessageCircle, MessageSquare} from "lucide-react";
+import {GitBranch, MessageSquare} from "lucide-react";
+import {TaskInfoInterface} from "@/services/TaskService.ts";
+import i18n from "i18next";
+
 
 const openTaskInfo =(taskId: string) => {
     // Ensure `dispatch` and `openSideBarTaskInfo` are properly imported or defined.
@@ -22,7 +22,7 @@ const openTaskInfo =(taskId: string) => {
         })
     );
 }
-const columns: ColumnDef<Task>[] = [
+const columns: ColumnDef<TaskInfoInterface>[] = [
     // {
     //     id: "select",
     //     header: ({ table }) => (
@@ -50,7 +50,7 @@ const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "task_name",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Title" />
+            <DataTableColumnHeader column={column} title={i18n.t('title')} />
         ),
         cell: ({ row }) => {
             const label = row.original.task_label;
@@ -76,7 +76,7 @@ const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "task_status",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Status" />
+            <DataTableColumnHeader column={column} title={i18n.t("status")} />
         ),
         cell: ({ row }) => {
             const status = statuses.find(
@@ -92,7 +92,7 @@ const columns: ColumnDef<Task>[] = [
                     {status.icon && (
                         <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     )}
-                    <span>{status.label}</span>
+                    <span>{i18n.t(status.value)}</span>
                 </div>
             );
         },
@@ -104,7 +104,7 @@ const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "task_priority",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Priority" />
+            <DataTableColumnHeader column={column} title={i18n.t("priority")} />
         ),
         cell: ({ row }) => {
             const priority = priorities.find(
@@ -120,7 +120,7 @@ const columns: ColumnDef<Task>[] = [
                     {priority.icon && (
                         <priority.icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     )}
-                    <span>{priority.label}</span>
+                    <span>{i18n.t(priority.value)}</span>
                 </div>
             );
         },
@@ -132,7 +132,7 @@ const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "task_project_name",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Project" />
+            <DataTableColumnHeader column={column} title={i18n.t('project')} />
         ),
         cell: ({ row }) => (
             <div className="flex space-x-2">
@@ -142,14 +142,14 @@ const columns: ColumnDef<Task>[] = [
             </div>
         ),
         enableSorting: false,
-        filterFn: (row, id, filterValue) => {
+        filterFn: (row, _, filterValue) => {
             return  filterValue.includes(row.original.task_project.uid);
         },
     },
     {
         accessorKey: "task_start_date",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Start Date" />
+            <DataTableColumnHeader column={column} title={i18n.t("startDate")} />
         ),
         cell: ({ row }) =>{
 
@@ -168,14 +168,14 @@ const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "task_due_date",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Due Date" />
+            <DataTableColumnHeader column={column} title={i18n.t("dueDate")} />
         ),
         cell: ({ row }) => {
             const d = new Date(row.getValue("task_due_date"))
             return (
             <div className="flex space-x-2 hover: cursor-pointer w-full text-xs" onClick={()=>{openTaskInfo(row.original.task_uuid)}}>
         <span className={`${
-            d < new Date() && !isZeroEpoch(row.getValue("task_due_date")) ? 'text-destructive' : ''
+            d < new Date() && !isZeroEpoch(row.getValue("task_due_date")) && row.original.task_status !== 'done'? 'text-destructive' : ''
                                 } `}>
           {!isZeroEpoch(row.getValue("task_due_date")) ? format(d, "dd MMM yyyy") : "--"}
         </span>
@@ -188,7 +188,7 @@ const columns: ColumnDef<Task>[] = [
     {
         accessorKey: "task_created_at",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Created Date" />
+            <DataTableColumnHeader column={column} title={i18n.t("createdDate")} />
         ),
         cell: ({ row }) => {
             const d = new Date(row.getValue("task_created_at"))

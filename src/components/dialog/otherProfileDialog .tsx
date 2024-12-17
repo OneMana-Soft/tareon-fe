@@ -1,14 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { cn } from "@/lib/utils";
-import { toast, useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,26 +13,20 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect, useState } from "react";
+import { useEffect} from "react";
 import ProfileService from "@/services/ProfileService";
-import {
-  TOAST_TITLE_FAILURE,
-  TOAST_TITLE_SUCCESS,
-} from "@/constants/dailog/const";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
 import MediaService, {
-  ATTACHMMENT_UPLOAD_FOR_ALL_PROJECT,
-  UploadFileInterfaceRes,
 } from "@/services/MediaService";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
+import {useTranslation} from "react-i18next";
+
 
 const profileFormSchema = z.object({
   teamName: z
@@ -67,6 +57,7 @@ const OtherProfileDialog: React.FC<editProfileDialogProps> = ({
   userUUID,
 }) => {
   const profileInfo = ProfileService.getUserProfileForID(userUUID);
+  const {t} = useTranslation()
 
   const profileImageRes = MediaService.getMediaURLForID(
     profileInfo.userData?.data.user_profile_object_key || ""
@@ -109,8 +100,7 @@ const OtherProfileDialog: React.FC<editProfileDialogProps> = ({
       {/*</DialogTrigger>*/}
       <DialogContent className="sm:max-w-fit">
         <DialogHeader>
-          <DialogTitle>Profile</DialogTitle>
-          <DialogDescription>Edit profile</DialogDescription>
+          <DialogTitle>{t('memberProfile')}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-row ">
           <div className="flex flex-col justify-center items-center h-full mr-12">
@@ -141,7 +131,7 @@ const OtherProfileDialog: React.FC<editProfileDialogProps> = ({
                   name="jobTitle"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Job Tile</FormLabel>
+                      <FormLabel>{t('jobTitle')}</FormLabel>
                       <FormControl>
                         <Input {...field} readOnly={true} />
                       </FormControl>
@@ -154,7 +144,7 @@ const OtherProfileDialog: React.FC<editProfileDialogProps> = ({
                   name="teamName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Team Name</FormLabel>
+                      <FormLabel>{t('teamName')}</FormLabel>
                       <FormControl>
                         <Input {...field} readOnly={true} />
                       </FormControl>
@@ -167,10 +157,10 @@ const OtherProfileDialog: React.FC<editProfileDialogProps> = ({
                   name="aboutMe"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>About me</FormLabel>
+                      <FormLabel>{t('aboutMe')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Tell us a little bit about yourself"
+                          placeholder=""
                           className="resize-none"
                           readOnly={true}
                           {...field}
@@ -181,9 +171,7 @@ const OtherProfileDialog: React.FC<editProfileDialogProps> = ({
                   )}
                 />
 
-                <DialogFooter>
-                  <Button type="submit">Update</Button>
-                </DialogFooter>
+
               </form>
             </Form>
           </div>

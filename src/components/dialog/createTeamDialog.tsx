@@ -6,7 +6,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,10 +13,9 @@ import profileService from "@/services/ProfileService.ts";
 import { useState } from "react";
 import TeamService from "@/services/TeamService.ts";
 import { useToast } from "@/hooks/use-toast.ts";
-import { ToastAction } from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 import {
-  TOAST_TITLE_FAILURE,
-  TOAST_TITLE_SUCCESS,
+ TOAST_UNKNOWN_ERROR,
 } from "@/constants/dailog/const.tsx";
 
 interface createTaskDialogProps {
@@ -31,8 +29,12 @@ const CreateTeamDialog: React.FC<createTaskDialogProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const { toast } = useToast();
+  const {t} = useTranslation()
+
 
   const teamAdminList = TeamService.getTeamListInAdminInfo();
+  const selfUserProfile = profileService.getSelfUserProfile();
+
 
   let disableButton = true;
 
@@ -45,23 +47,24 @@ const CreateTeamDialog: React.FC<createTaskDialogProps> = ({
   };
 
   const handleSubmit = async () => {
-    const res = await TeamService.CreateTeam({ team_name: inputValue });
 
-    if (res.status != 200) {
+    try {
+      await TeamService.CreateTeam({ team_name: inputValue });
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: "Failed to create new team",
+        title:  t('success'),
+        description: t('createdNewTeam'),
       });
 
-      return;
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : TOAST_UNKNOWN_ERROR;
+      toast({
+        title: t('failure'),
+        description: `${t('failedToCreateTeam')}: ${errorMessage}`,
+      });
     }
 
-    toast({
-      title: TOAST_TITLE_SUCCESS,
-      description: "Created new team",
-    });
-
-    await teamAdminList.mutate();
+    teamAdminList.mutate()
+    selfUserProfile.userMutate()
 
     setInputValue("");
 
@@ -79,24 +82,24 @@ const CreateTeamDialog: React.FC<createTaskDialogProps> = ({
       {/*</DialogTrigger>*/}
       <DialogContent className="sm:max-w-[475px]">
         <DialogHeader>
-          <DialogTitle>Create team</DialogTitle>
-          <DialogDescription>Please type team name</DialogDescription>
+          <DialogTitle>{t('createTeam')}</DialogTitle>
+          <DialogDescription>{t('typeTeamName')}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t('name')}</Label>
             <Input
               id="name"
               value={inputValue}
               onChange={handleInputChange}
-              placeholder="Type team name..."
+              placeholder={t('typeTeamNamePlaceholder')}
               autoFocus
             />
           </div>
         </div>
         <DialogFooter>
           <Button onClick={handleSubmit} disabled={disableButton}>
-            Create Team
+            {t('createTeam')}
           </Button>
         </DialogFooter>
       </DialogContent>

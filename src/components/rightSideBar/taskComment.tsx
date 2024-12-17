@@ -1,30 +1,22 @@
-import React, { useState } from "react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import {Check, ChevronDown, UserCircle, X} from "lucide-react"
+import {ChevronDown} from "lucide-react"
 import { cn } from "@/lib/utils"
 import taskService, { CommentInfoInterface } from "@/services/TaskService"
-import profileService, { UserProfileDataInterface, UserProfileInterface } from "@/services/ProfileService"
 import mediaService from "@/services/MediaService"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip.tsx"
 import { formatDateForComment, getNameInitials, isZeroEpoch } from "@/utils/Helper.ts"
-import { Content } from "@tiptap/core/dist/types"
 import MinimalTiptapTask from "@/components/textInput/textInput.tsx"
 import {
     DropdownMenu,
-    DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuTrigger
 } from "../ui/dropdown-menu"
 import { DropdownMenuContent } from "@/components/ui/dropdown-menu.tsx"
-import {TOAST_TITLE_FAILURE, TOAST_TITLE_SUCCESS, TOAST_UNKNOWN_ERROR} from "@/constants/dailog/const.tsx";
+import { TOAST_UNKNOWN_ERROR} from "@/constants/dailog/const.tsx";
 import {useToast} from "@/hooks/use-toast.ts";
-import AttachmentIcon from "@/components/attachmentIcon/attachmentIcon.tsx";
-import TaskAttachment from "@/components/rightSideBar/taskAttachment.tsx";
 import TaskCommentAttachment from "@/components/rightSideBar/taskCommentAttachment.tsx";
+import {useTranslation} from "react-i18next";
 
 interface TaskCommentProps {
     commentInfo: CommentInfoInterface,
@@ -41,6 +33,8 @@ export default function TaskComment({ commentInfo, taskUUID, isOwner, isAdmin }:
     const taskInfo = taskService.getTaskInfo(taskUUID)
 
     const [enableEdit, setEnableEdit] = useState(false)
+    const {t} = useTranslation()
+
 
     const { toast } = useToast();
 
@@ -52,8 +46,8 @@ export default function TaskComment({ commentInfo, taskUUID, isOwner, isAdmin }:
         try {
             await taskService.deleteTaskComment(commentInfo.comment_uuid)
             toast({
-                title: TOAST_TITLE_SUCCESS,
-                description: `Deleted task comment`,
+                title: t('success'),
+                description: t('deletedTaskComment'),
             })
 
             await taskInfo.mutate()
@@ -64,8 +58,8 @@ export default function TaskComment({ commentInfo, taskUUID, isOwner, isAdmin }:
                 : TOAST_UNKNOWN_ERROR;
 
             toast({
-                title: TOAST_TITLE_FAILURE,
-                description: `Failed to delete task: ${errorMessage}`,
+                title: t('failure'),
+                description: `${t('failedToDeleteTaskComment')}: ${errorMessage}`,
                 variant: "destructive",
             })
 
@@ -78,8 +72,8 @@ export default function TaskComment({ commentInfo, taskUUID, isOwner, isAdmin }:
 
             await taskService.updateTaskComment({task_comment_uuid:  commentInfo.comment_uuid, task_comment_body: localCommentBody})
             toast({
-                title: TOAST_TITLE_SUCCESS,
-                description: `Updated task comment`,
+                title: t('success'),
+                description: t('updatedTaskComment'),
             })
 
             await taskInfo.mutate()
@@ -91,8 +85,8 @@ export default function TaskComment({ commentInfo, taskUUID, isOwner, isAdmin }:
                 : TOAST_UNKNOWN_ERROR;
 
             toast({
-                title: TOAST_TITLE_FAILURE,
-                description: `Failed to update task desc: ${errorMessage}`,
+                title: t('failure'),
+                description: `${t('failedToUpdateTaskComment')}: ${errorMessage}`,
                 variant: "destructive",
             })
 
@@ -132,18 +126,19 @@ export default function TaskComment({ commentInfo, taskUUID, isOwner, isAdmin }:
                         editorContentClassName="overflow-auto"
                         output="html"
                         content={localCommentBody}
-                        placeholder="Add comment..."
+                        placeholder={t('addCommentPlaceholder')}
                         editable={enableEdit}
-                        buttonLabel='Save'
+                        buttonLabel={t('save')}
                         buttonOnclick={() => {
                             handleUpdateComment()
                         }}
-                        secondaryButtonLabel='Cancel'
+                        secondaryButtonLabel={t('cancel')}
                         secondaryButtonOnclick={() => {
                             setEnableEdit(false)
                         }}
                         editorClassName="focus:outline-none px-5 py-4"
-                        onChange={(content: Content) => {
+                        onChange={(content) => {
+                            if(!content) return
                             setLocalCommentBody(content.toString() || '')
                         }}
                     />
@@ -167,11 +162,11 @@ export default function TaskComment({ commentInfo, taskUUID, isOwner, isAdmin }:
                     <DropdownMenuContent className="w-fit">
                         {isOwner && <DropdownMenuItem className='hover:cursor-pointer'
                                                       onClick={() => setEnableEdit(!enableEdit)}>
-                            <span>Edit</span>
+                            <span>{t('edit')}</span>
                         </DropdownMenuItem>}
                         {(isOwner || isAdmin) &&
                             <DropdownMenuItem className='hover:cursor-pointer' onClick={handleDeleteComment}>
-                                <span>Delete</span>
+                                <span>{t('delete')}</span>
                             </DropdownMenuItem>
                         }
                     </DropdownMenuContent>

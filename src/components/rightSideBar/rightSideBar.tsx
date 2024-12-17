@@ -2,12 +2,11 @@ import React, {useState, useEffect, Fragment, useRef, useCallback} from "react";
 import {
   ArrowRightToLine,
   Calendar as CalenderIcon,
-  Check, ChevronDown,
+  Check,
   ChevronRight, ChevronsUpDown,
   CircleCheck,
   CirclePlus, EllipsisVertical,
-  GripVertical, Maximize2, Minimize2, Plus, Trash, Trash2,
-  User,
+  GripVertical, Maximize2, Minimize2, Trash, Trash2,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,20 +17,17 @@ import { Content } from "node_modules/@tiptap/core/dist/types";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input.tsx";
 import { Transition } from "@headlessui/react";
-import { Textarea } from "@/components/ui/textarea.tsx";
-import taskService, {CreateTaskInterface, TaskInfoInterface} from "@/services/TaskService.ts";
+import taskService, {CreateTaskInterface} from "@/services/TaskService.ts";
 import {Badge} from "@/components/ui/badge.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@/store/store.ts";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command.tsx";
-import profileService, {UserProfileDataInterface, UserProfileInterface} from "@/services/ProfileService.ts";
-import {TOAST_TITLE_FAILURE, TOAST_TITLE_SUCCESS, TOAST_UNKNOWN_ERROR} from "@/constants/dailog/const.tsx";
+import profileService, {UserProfileDataInterface} from "@/services/ProfileService.ts";
+import {TOAST_UNKNOWN_ERROR} from "@/constants/dailog/const.tsx";
 import {useToast} from "@/hooks/use-toast.ts";
-import {isZeroEpoch, throttle} from "@/utils/Helper.ts";
+import {isZeroEpoch} from "@/utils/Helper.ts";
 import {useThrottle} from "@/components/minimal-tiptap/hooks/use-throttle.ts";
-import {Editor} from "@tiptap/core";
-import {getOutput} from "@/components/minimal-tiptap/utils.ts";
 import {format} from "date-fns";
 import {Calendar} from "@/components/ui/calendar.tsx";
 import {prioritiesInterface, statuses, priorities} from "@/components/task/data.tsx";
@@ -53,13 +49,6 @@ import {
   updateTaskCommentPreviewFiles
 } from "@/store/slice/createTaskCommentSlice.ts";
 import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
-import {
-  addCreateTaskDialogPreviewFiles,
-  addCreateTaskDialogUploadedFiles,
-  deleteCreateTaskDialogPreviewFiles,
-  removeCreateTaskUploadedFiles,
-  updateCreateTaskDialogPreviewFiles
-} from "@/store/slice/createTaskDailogSlice.ts";
 import mediaService, {
   AttachmentMediaReq,
   ATTACHMMENT_UPLOAD_FOR_ALL_PROJECT,
@@ -76,6 +65,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
+import {useTranslation} from "react-i18next";
 
 interface OtherUserProfileModalProps {
   sideBarOpenState: boolean;
@@ -90,10 +80,6 @@ interface subTaskInterface {
   task_assignee_uuid: string|undefined
 }
 
-type Props = {
-  children: JSX.Element;
-};
-
 const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
   sideBarOpenState,
   setOpenState,
@@ -102,6 +88,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
   const [isResizing, setIsResizing] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(1000);
   const [isTaskDropdownOpen, setIsTaskDropdownOpen] = useState(false);
+  const {t} = useTranslation()
+
 
   const [isFullScreen, setIsFullScreen] = useState(false);
 
@@ -116,7 +104,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
   const [subTaskInfo, setSubTaskInfo] = useState<subTaskInterface | undefined>(undefined);
 
   const [taskLabelWidth, setTaskLabelWidth] = useState(0)
-  const [taskLabel, setTaskLabel] = useState('add label');
+  const [taskLabel, setTaskLabel] = useState(t('addLabel'));
 
   const [openTaskStatus, setOpenTaskStatus] = useState<boolean>(false)
   const [selectedStatus, setSelectedStatus] = useState<prioritiesInterface|undefined>(undefined)
@@ -180,8 +168,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
       });
 
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: `Added ${taskAttachments.length} attachment(s) to task`,
+        title: t('success'),
+        description: t('addAttachmentToTask', {count: taskAttachments.length}),
       });
 
       dispatch(clearTaskInfoInputState({taskUUID: taskUUID}));
@@ -190,8 +178,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : TOAST_UNKNOWN_ERROR;
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to add attachments to task: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToAddAttachmentToTask')}: ${errorMessage}`,
         variant: "destructive",
       });
     }
@@ -457,8 +445,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
         await taskService.updateTaskAssignee({task_assignee_uuid: userUUID, task_uuid: taskId, task_project_uuid: taskInfo.taskData?.data.task_project.project_uuid});
 
         toast({
-          title: TOAST_TITLE_SUCCESS,
-          description: "Updated task assignee",
+          title: t('success'),
+          description: t('updateTaskAssignee'),
         });
 
         await taskInfo.mutate()
@@ -470,8 +458,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
             : TOAST_UNKNOWN_ERROR;
 
         toast({
-          title: TOAST_TITLE_FAILURE,
-          description: `Failed to update task assignee: ${errorMessage}`,
+          title: t('failure'),
+          description: `${t('failedToUpdateTaskAssignee')}: ${errorMessage}`,
           variant: "destructive",
         })
 
@@ -497,8 +485,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
       }
       await taskService.createTaskComment({task_comment_body: commentState[taskUUID]?.commentBody, task_uuid: taskUUID, task_comment_attachments: commentAttachments})
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: "Added comment to task",
+        title: t('success'),
+        description: t('addedCommentToTask'),
       });
 
       await taskInfo.mutate()
@@ -511,8 +499,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
           : TOAST_UNKNOWN_ERROR;
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to add comment to task: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToAddCommentToTask')}: ${errorMessage}`,
         variant: "destructive",
       })
 
@@ -538,8 +526,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
       await taskService.updateTaskName({task_uuid:taskId, task_name:taskName, task_project_uuid:taskInfo.taskData?.data.task_project.project_uuid})
 
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: "Updated task name",
+        title: t('success'),
+        description: t('updatedTask'),
       });
 
     }catch (e) {
@@ -548,8 +536,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
           : TOAST_UNKNOWN_ERROR;
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to update task name: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToUpdateTaskName')}: ${errorMessage}`,
         variant: "destructive",
       })
 
@@ -566,8 +554,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
       await taskService.updateTaskLabel({task_uuid:taskUUID, task_label:taskLabel, task_project_uuid:taskInfo.taskData?.data.task_project.project_uuid})
 
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: "Updated task label",
+        title: t('success'),
+        description: t('updatedTaskLabel'),
       });
 
     } catch (e) {
@@ -577,8 +565,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
           : TOAST_UNKNOWN_ERROR;
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to update task label: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToUpdateTaskLabel')}: ${errorMessage}`,
         variant: "destructive",
       })
 
@@ -594,8 +582,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
     try {
       await taskService.updateTaskStartDate({task_uuid:taskId, task_start_date: newStartDate ? newStartDate.toISOString() : '', task_project_uuid:taskInfo.taskData?.data.task_project.project_uuid})
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: "Updated task start date",
+        title: t('success'),
+        description: t('updateTaskStartDate'),
       });
 
     } catch (e) {
@@ -604,8 +592,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
           : TOAST_UNKNOWN_ERROR;
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to update task start date: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToUpdateTaskStartDate')}: ${errorMessage}`,
         variant: "destructive",
       })
 
@@ -622,8 +610,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
       await taskService.updateTaskDueDate({task_uuid:taskId, task_due_date: newDueDate ? newDueDate.toISOString() : '', task_project_uuid:taskInfo.taskData?.data.task_project.project_uuid})
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: "Failed to update task due date",
+        title: t('success'),
+        description: t('updatedTaskDueDate'),
       });
 
     } catch (e) {
@@ -632,8 +620,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
           : TOAST_UNKNOWN_ERROR;
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to update task start date: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToUpdatedTaskDueDate')}: ${errorMessage}`,
         variant: "destructive",
       })
 
@@ -648,8 +636,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
     try {
       await taskService.updateTaskStatus({task_status: taskStatus, task_uuid: taskId, task_project_uuid: taskInfo.taskData?.data.task_project.project_uuid})
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: "Updated task status",
+        title: t('success'),
+        description: t('updatedTaskStatus'),
       });
 
     } catch (e) {
@@ -659,8 +647,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
           : TOAST_UNKNOWN_ERROR;
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to update task start date: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToUpdateTaskStatus')}: ${errorMessage}`,
         variant: "destructive",
       })
 
@@ -707,8 +695,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
     try {
       await taskService.updateTaskPriority({task_priority: taskPriority, task_uuid: taskUUID, task_project_uuid: taskInfo.taskData?.data.task_project.project_uuid})
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: "Updated task priority",
+        title: t('success'),
+        description: t('updateTaskPriority'),
       });
 
     } catch (e) {
@@ -717,8 +705,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
           : TOAST_UNKNOWN_ERROR;
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to update task priority: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToUpdateTaskPriority')}: ${errorMessage}`,
         variant: "destructive",
       })
 
@@ -739,8 +727,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
       await taskService.updateTaskDesc({task_description: taskDesc, task_uuid: taskUUID, task_project_uuid: taskInfo.taskData?.data.task_project.project_uuid})
 
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: "Updated task desc",
+        title: t('success'),
+        description: t('updatedTaskDesc'),
       });
 
     }catch (e) {
@@ -749,8 +737,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
           : TOAST_UNKNOWN_ERROR;
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to update task desc: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToUpdateTaskDesc')}: ${errorMessage}`,
         variant: "destructive",
       })
 
@@ -777,8 +765,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
     try {
       await taskService.unDeleteTask(taskUUID)
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: "Undeleted task",
+        title: t('success'),
+        description: t('unrelatedTask'),
       });
 
     } catch (e) {
@@ -787,8 +775,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
           : TOAST_UNKNOWN_ERROR;
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to undelete task: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToUndeleteTask')}: ${errorMessage}`,
         variant: "destructive",
       })
 
@@ -819,8 +807,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
       await taskService.createSubTask(postBody)
 
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: "Created sub task",
+        title: t('success'),
+        description: t('createSubTask'),
       });
 
     }catch (e) {
@@ -829,8 +817,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
           : TOAST_UNKNOWN_ERROR;
 
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to sub task: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToCreateSubTask')}: ${errorMessage}`,
         variant: "destructive",
       })
 
@@ -889,7 +877,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
               <div className="flex-1">
                 {taskInfo.taskData?.data.task_status != 'done' && <Button variant="outline" onClick={()=>{updateTaskStatus('done', taskUUID)}} disabled={!isAdmin}>
                   <CircleCheck className="h-5 w-5" />
-                  <span className="">{ 'Mark as complete'}</span>
+                  <span className="">{ t('markAsCompleted')}</span>
                 </Button>}
               </div>
               <div className="flex justify-center items-center">
@@ -949,10 +937,10 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
               <div className='w-full bg-red-700 mb-2 pl-4 pr-4 rounded-sm h-16 text-red-200 flex justify-between items-center'>
                 <div className= 'flex gap-x-2'>
                   <Trash2 className='h-5 w-5'/>
-                  This task is deleted
+                  {t('thisTaskIsDeleted')}
                 </div>
                 <Button variant='destructive' onClick={handleUndeleteTask}>
-                  Undelete
+                  {t('undelete')}
                 </Button>
               </div>
             }
@@ -973,12 +961,12 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                           fontWeight: 'inherit',
                         }}
                     >
-                    {taskLabel || 'add label'}
+                    {taskLabel || t('addLabel')}
                   </span>
                 <Input
                     type={'text'}
                     value={taskLabel}
-                    placeholder='add label'
+                    placeholder= {t('addLabel')}
                     readOnly={!isAdmin}
                     className="m-0 !h-fit !w-fit border-0 p-0 shadow-none !ring-0 focus:border-0 focus:outline-none focus-visible:ring-0"
                     onChange={handleChangeTaskLabel}
@@ -1012,21 +1000,21 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                                 {selectedStatus.label}
                               </>
                           ) : (
-                              <>+ Set status</>
+                              <>+ {t('setStatus')}</>
                           )}
                         </Button>
                       </PopoverTrigger>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Task status</p>
+                      <p>{t('taskStatus')}</p>
                     </TooltipContent>
                   </Tooltip>
 
                   <PopoverContent className="p-0" side="right" align="start">
                     <Command>
-                      <CommandInput placeholder="Change status..."/>
+                      <CommandInput placeholder={t('changeStatusPlaceHolder')}/>
                       <CommandList>
-                        <CommandEmpty>No results found.</CommandEmpty>
+                        <CommandEmpty>{t('noResultFound')}</CommandEmpty>
                         <CommandGroup>
                           {statuses.map((status) => (
                               <CommandItem
@@ -1072,21 +1060,21 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                                 {selectedPriority.label}
                               </>
                           ) : (
-                              <>+ Set priority</>
+                              <>+ {t('setPriority')}</>
                           )}
                         </Button>
                       </PopoverTrigger>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Task priority</p>
+                      <p>{t('taskPriority')}</p>
                     </TooltipContent>
                   </Tooltip>
 
                   <PopoverContent className="p-0" side="right" align="start">
                     <Command>
-                      <CommandInput placeholder="Change priority..."/>
+                      <CommandInput placeholder={t('changePriority')}/>
                       <CommandList>
-                        <CommandEmpty>No results found.</CommandEmpty>
+                        <CommandEmpty>{t('noResultFound')}</CommandEmpty>
                         <CommandGroup>
                           {priorities.map((status) => (
                               <CommandItem
@@ -1108,7 +1096,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                                             : "opacity-40"
                                     )}
                                 />
-                                <span>{status.label}</span>
+                                <span>{t(status.label)}</span>
                               </CommandItem>
                           ))}
                         </CommandGroup>
@@ -1120,7 +1108,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
               </div>
               <div className="grid grid-cols-4 mb-6">
                 <div className="col-span-1">
-                  <Label>Assignee</Label>
+                  <Label>{t('assignee')}</Label>
                 </div>
                 <div className="col-span-3 -ml-4">
 
@@ -1134,8 +1122,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                           disabled={!isAdmin}
                       >
                         {taskAssignee
-                            ? taskInfo.taskData?.data.task_project.project_members.find((member) => member.user_uuid === taskAssignee.user_uuid)?.user_name
-                            : "Select Assignee..."}
+                            ? taskAssignee.user_name
+                            : t('selectAssignee')}
                         <ChevronsUpDown className="opacity-50"/>
                       </Button>
                     </PopoverTrigger>
@@ -1153,11 +1141,10 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                                       const userInfo = taskInfo.taskData?.data.task_project.project_members.find((member) => member.user_uuid === currentValue)
                                       const selectedTaskAssignee = currentValue === taskAssignee?.user_uuid ? undefined : userInfo
                                       setTaskAssignee(selectedTaskAssignee)
+                                      updateTaskAssignee(selectedTaskAssignee ? currentValue: undefined, taskUUID)
                                       setAssigneePopoverOpen(false)
-                                      if (selectedTaskAssignee) {
-                                        updateTaskAssignee(currentValue, taskUUID)
 
-                                      }
+
                                     }}
                                 >
                                   <span className='user-list-popover'>{member.user_name}</span>
@@ -1178,7 +1165,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
               </div>
               <div className="grid grid-cols-4 mb-6">
                 <div className="col-span-1 text-m">
-                  <Label>Start Date</Label>
+                  <Label>{t('startDate')}</Label>
                 </div>
                 <div className="col-span-3">
                   <div className='relative w-fit'>
@@ -1195,7 +1182,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                           {startDate ? (
                               format(startDate, "dd MMM")
                           ) : (
-                              <span>Start Date</span>
+                              <span>{t('startDate')}</span>
                           )}
                           <CalenderIcon className="ml-2 h-4 w-4"/>
                         </Button>
@@ -1230,7 +1217,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
               </div>
               <div className="grid grid-cols-4 mb-6">
                 <div className="col-span-1 text-m">
-                  <Label>Due Date</Label>
+                  <Label>{t('dueDate')}</Label>
                 </div>
                 <div className="col-span-3">
                   <div className='relative w-fit'>
@@ -1245,7 +1232,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                             )}
                             disabled={!isAdmin}
                         >
-                          {dueDate ? format(dueDate, "dd MMM") : <span>Due Date</span>}
+                          {dueDate ? format(dueDate, "dd MMM") : <span>{t('dueDate')}</span>}
                           <CalenderIcon className="ml-2 h-4 w-4"/>
                         </Button>
                       </PopoverTrigger>
@@ -1279,25 +1266,25 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
               </div>
               <div className="grid grid-cols-4 mb-6">
                 <div className="col-span-1 text-m">
-                  <Label>Project</Label>
+                  <Label>{t('project')}</Label>
                 </div>
                 <div className="col-span-3">{taskInfo.taskData?.data.task_project.project_name}</div>
               </div>
               <div className="grid grid-cols-4 mb-6">
                 <div className="col-span-1 text-m">
-                  <Label>Team</Label>
+                  <Label>{t('team')}</Label>
                 </div>
                 <div className="col-span-3">{taskInfo.taskData?.data.task_team.team_name}</div>
               </div>
               <div className="grid gap-2 mb-4">
-                <Label>Description</Label>
+                <Label>{t('description')}</Label>
                 <MinimalTiptapTask
                     throttleDelay={3000}
                     className={cn("h-full rounded-xl min-h-48")}
                     editorContentClassName="overflow-auto h-full"
                     output="html"
                     content={taskInfo.taskData?.data.task_description}
-                    placeholder="Description..."
+                    placeholder={t('descriptionPlaceholder')}
                     editable={isAdmin}
                     editorClassName="focus:outline-none px-5 py-4 h-full"
                     onChange={(content: Content) => {
@@ -1307,10 +1294,10 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                 />
               </div>
               <div className='mb-2'>
-                <Label className='inline'>Attachments</Label>
+                <Label className='inline'>{t('attachments')}</Label>
               </div>
               <Label htmlFor="file-upload-task" className="cursor-pointer text-sm  text-muted-foreground hover:underline">
-                Attach files
+                {t('attachFiles')}
               </Label>
 
               <Input
@@ -1371,7 +1358,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
               </div>
 
               <div className='mb-4'>
-                <Label>Subtasks</Label>
+                <Label>{t('subTasks')}</Label>
               </div>
               {/* Subtask items */}
               {taskInfo.taskData?.data.task_sub_tasks && taskInfo.taskData?.data.task_sub_tasks
@@ -1428,7 +1415,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                                         </PopoverTrigger>
                                       </TooltipTrigger>
                                       <TooltipContent>
-                                        <p>Start Date</p>
+                                        <p>{t('startDate')}</p>
                                       </TooltipContent>
                                     </Tooltip>
 
@@ -1479,7 +1466,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                                         </PopoverTrigger>
                                       </TooltipTrigger>
                                       <TooltipContent>
-                                        <p>Due Date</p>
+                                        <p>{t('dueDate')}</p>
                                       </TooltipContent>
                                     </Tooltip>
 
@@ -1570,7 +1557,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                               {subTaskInfo.task_start_date ? (
                                   format(subTaskInfo.task_start_date, "dd MMM")
                               ) : (
-                                  <span>Start Date</span>
+                                  <span>{t('startDate')}</span>
                               )}
                               <CalenderIcon className="ml-2 h-4 w-4"/>
                             </Button>
@@ -1621,7 +1608,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                               {subTaskInfo.task_due_date ? (
                                   format(subTaskInfo.task_due_date, "dd MMM")
                               ) : (
-                                  <span>Due Date</span>
+                                  <span>{t('dueDate')}</span>
                               )}
                               <CalenderIcon className="ml-2 h-4 w-4"/>
                             </Button>
@@ -1681,13 +1668,13 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                 })
 
               }}>
-                <CirclePlus className="mr-2 h-4 w-4"/> Add sub task
+                <CirclePlus className="mr-2 h-4 w-4"/> {t('addSubTask')}
               </Button>
 
               <Separator orientation='horizontal'/>
               <div className='mt-4'>
                 <div className='mb-4'>
-                  <Label>Comments
+                  <Label>{t('comments')}
                     (<span>{taskInfo.taskData?.data?.task_comments ? taskInfo.taskData?.data.task_comments.length : '0'}</span>)</Label>
                 </div>
 
@@ -1717,9 +1704,9 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                   editorContentClassName="overflow-auto"
                   output="html"
                   content={commentState[taskUUID]?.commentBody}
-                  placeholder="Add comment..."
+                  placeholder={t('addCommentPlaceholder')}
                   editable={true}
-                  buttonLabel='Comment'
+                  buttonLabel={t('comment')}
                   buttonOnclick={createComment}
                   editorClassName="focus:outline-none px-5 py-4"
                   onChange={(content: Content) => {
@@ -1728,7 +1715,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
               />
             </div>
             <Label htmlFor="file-upload-task-comment" className="cursor-pointer ml-2 pt-2 text-muted-foreground hover:underline">
-              Attach files
+              {t('attachFiles')}
             </Label>
 
             <Input

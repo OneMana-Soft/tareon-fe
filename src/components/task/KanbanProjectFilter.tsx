@@ -1,6 +1,4 @@
-import * as React from "react";
 import { CheckIcon, PlusCircledIcon } from "@radix-ui/react-icons";
-import { Column } from "@tanstack/react-table";
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import profileService from "@/services/ProfileService.ts";
+import {useTranslation} from "react-i18next";
 
 interface KanbanProjectFilterProps {
   activeList: string[];
@@ -34,13 +33,15 @@ export function KanbanProjectFilter({
 
 }: KanbanProjectFilterProps) {
   const selfUserProfile = profileService.getSelfUserProfile()
+  const {t} = useTranslation()
+
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 border-dashed">
           <PlusCircledIcon className="mr-2 h-4 w-4" />
-          {"Project"}
+          {t('project')}
           {activeList.length > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
@@ -78,9 +79,9 @@ export function KanbanProjectFilter({
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
-          <CommandInput placeholder={"Project"} />
+          <CommandInput placeholder={t('project')} />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>{t('noResultFound')}</CommandEmpty>
             <CommandGroup>
               {selfUserProfile.userData?.data.user_projects && selfUserProfile.userData?.data.user_projects.map((option) => {
                 const isSelected = activeList.includes(option.uid);
@@ -126,7 +127,7 @@ export function KanbanProjectFilter({
                     onSelect={() => updateList([])}
                     className="justify-center text-center"
                   >
-                    Clear filters
+                    {t('clearFilters')}
                   </CommandItem>
                 </CommandGroup>
               </>

@@ -1,17 +1,12 @@
-
 import { MyTaskTable } from "@/components/task/myTaskTable.tsx";
-import taskService from "@/services/TaskService.ts";
-import columns from "@/components/task/taskColumns.tsx";
-import {Suspense} from "react";
-import { DataTableSkeleton } from "@/components/tableSkeleton";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import {Kanban,  List} from "lucide-react";
 import {MyTaskKanban} from "@/components/task/myTaskKanban.tsx";
-
-
+import {useTranslation} from "react-i18next";
 
 
 const TaskPage: React.FC = () => {
+  const {t} = useTranslation()
 
 
   return (
@@ -19,9 +14,9 @@ const TaskPage: React.FC = () => {
       <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
         <div className="flex items-center justify-between space-y-2">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">My tasks</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">{t('myTasks')}</h2>
             <p className="text-muted-foreground">
-              Here&apos;s a list of your tasks
+              {t('hereAListOfYourTask')}
             </p>
           </div>
         </div>
@@ -30,10 +25,10 @@ const TaskPage: React.FC = () => {
         <Tabs defaultValue="list" className="w-full ">
           <TabsList>
             <TabsTrigger value="list">
-              <List className='h-4 w-4 mr-2'/>List
+              <List className='h-4 w-4 mr-2'/>{t('list')}
             </TabsTrigger>
             <TabsTrigger value="kanban">
-              <Kanban className='h-4 w-4 mr-2'/>Board
+              <Kanban className='h-4 w-4 mr-2'/>{t('board')}
             </TabsTrigger>
           </TabsList>
           <TabsContent value="list" className='p-4'><MyTaskTable/></TabsContent>

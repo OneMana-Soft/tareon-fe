@@ -49,11 +49,6 @@ interface ClearTaskComment {
     taskUUID: string
 }
 
-interface createOrUpdateCommentBody {
-   taskUUID: string
-    body: string
-}
-
 const initialState = {
     taskInfoInputState: {} as ExtendedTaskInfoInputState
 }

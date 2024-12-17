@@ -9,11 +9,10 @@ import {
 } from "@/components/ui/dialog";
 
 import { useState } from "react";
-import TeamService, { TeamInfoInterface } from "@/services/TeamService.ts";
+import  { TeamInfoInterface } from "@/services/TeamService.ts";
 import { useToast } from "@/hooks/use-toast.ts";
 import {
-  TOAST_TITLE_FAILURE,
-  TOAST_TITLE_SUCCESS,
+   TOAST_UNKNOWN_ERROR,
 } from "@/constants/dailog/const.tsx";
 import {
   Popover,
@@ -28,12 +27,12 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { cn } from "@/lib/utils.ts";
 import teamService from "@/services/TeamService.ts";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import projectService from "@/services/ProjectService.ts";
-import ProjectService from "@/services/ProjectService.ts";
+import {useTranslation} from "react-i18next";
+import profileService from "@/services/ProfileService.ts";
 
 interface createTaskDialogProps {
   dialogOpenState: boolean;
@@ -46,6 +45,8 @@ const CreateProjectDialog: React.FC<createTaskDialogProps> = ({
 }) => {
   const [projectName, setProjectName] = useState<string>("");
   const { toast } = useToast();
+  const {t} = useTranslation()
+
 
   const [popOpen, setPopOpen] = useState(false);
 
@@ -53,6 +54,7 @@ const CreateProjectDialog: React.FC<createTaskDialogProps> = ({
     null
   );
 
+  const selfUserProfile = profileService.getSelfUserProfile();
   const projectAdminList = projectService.getTeamListInAdminInfo();
 
   let disableButton = true;
@@ -68,26 +70,28 @@ const CreateProjectDialog: React.FC<createTaskDialogProps> = ({
   const teamInfo = teamService.getTeamListInAdminInfo();
 
   const handleSubmit = async () => {
-    const res = await projectService.CreateProject({
-      project_name: projectName,
-      project_team_uuid: selectedTeam?.team_uuid,
-    });
 
-    if (res.status != 200) {
-      toast({
-        title: TOAST_TITLE_FAILURE,
-        description: "Failed to create new project",
+    try {
+
+      await projectService.CreateProject({
+        project_name: projectName,
+        project_team_uuid: selectedTeam?.team_uuid,
       });
 
-      return;
+      toast({
+        title: t('success'),
+        description: t('createdNewProject'),
+      });
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : TOAST_UNKNOWN_ERROR;
+      toast({
+        title: t('failure'),
+        description: `${t('failedToCreateNewProject')}: ${errorMessage}`,
+      });
     }
 
-    toast({
-      title: TOAST_TITLE_SUCCESS,
-      description: "Created new project",
-    });
-
-    await projectAdminList.Mutate();
+    projectAdminList.Mutate();
+    selfUserProfile.userMutate()
 
     setProjectName("");
 
@@ -105,9 +109,9 @@ const CreateProjectDialog: React.FC<createTaskDialogProps> = ({
       {/*</DialogTrigger>*/}
       <DialogContent className="sm:max-w-[475px]">
         <DialogHeader>
-          <DialogTitle>Create project</DialogTitle>
+          <DialogTitle>{t('createProject')}</DialogTitle>
           <DialogDescription>
-            Select the team in which to create the project
+            {t('selectTeamCreateProject')}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -119,7 +123,7 @@ const CreateProjectDialog: React.FC<createTaskDialogProps> = ({
                   id="name"
                   value={projectName}
                   onChange={handleInputChange}
-                  placeholder="Enter project name..."
+                  placeholder={t('enterProjectName')}
                   autoFocus
                 />
               </div>
@@ -136,7 +140,7 @@ const CreateProjectDialog: React.FC<createTaskDialogProps> = ({
                           {selectedTeam.team_name}
                         </>
                       ) : (
-                        <>select team</>
+                        <>{t('selectTeam')}</>
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -181,7 +185,7 @@ const CreateProjectDialog: React.FC<createTaskDialogProps> = ({
         </div>
         <DialogFooter>
           <Button onClick={handleSubmit} disabled={disableButton}>
-            Create Project
+            {t('createProject')}
           </Button>
         </DialogFooter>
       </DialogContent>

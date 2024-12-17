@@ -9,12 +9,10 @@ import {
 } from "@/components/ui/dialog";
 
 import { useToast } from "@/hooks/use-toast.ts";
-import {
-  TOAST_TITLE_FAILURE,
-  TOAST_TITLE_SUCCESS, TOAST_UNKNOWN_ERROR,
+import {  TOAST_UNKNOWN_ERROR,
 } from "@/constants/dailog/const.tsx";
 import taskService from "@/services/TaskService.ts";
-import {useDispatch} from "react-redux";
+import {useTranslation} from "react-i18next";
 
 interface createTaskDeleteAlertDialogProps {
   dialogOpenState: boolean;
@@ -32,21 +30,23 @@ const CreateTaskDeleteAlertDialog: React.FC<createTaskDeleteAlertDialogProps> = 
 }) => {
   const { toast } = useToast();
   const taskInfo = taskService.getTaskInfo(taskUUID)
+  const {t} = useTranslation()
+
 
   const handleDeleteTask = async () => {
     try{
       await taskService.deleteTask(taskUUID)
       toast({
-        title: TOAST_TITLE_SUCCESS,
-        description: "Deleted Task",
+        title: t('success'),
+        description: t('Deleted Task'),
       });
 
     }catch (e) {
 
       const errorMessage = e instanceof Error ? e.message : TOAST_UNKNOWN_ERROR;
       toast({
-        title: TOAST_TITLE_FAILURE,
-        description: `Failed to delete task: ${errorMessage}`,
+        title: t('failure'),
+        description: `${t('failedToDeleteTask')}: ${errorMessage}`,
         variant: "destructive",
       });
 
@@ -66,24 +66,24 @@ const CreateTaskDeleteAlertDialog: React.FC<createTaskDeleteAlertDialogProps> = 
 
       <DialogContent className="sm:max-w-[475px]">
         <DialogHeader>
-          <DialogTitle>Alert</DialogTitle>
-          <DialogDescription>Deleting task</DialogDescription>
+          <DialogTitle>{t('alert')}</DialogTitle>
+          <DialogDescription>{t('deletingTask')}</DialogDescription>
         </DialogHeader>
         {hasSubTasks ?
             <div>
-              Task has undeleted sub tasks. Until all sub task are deleted this task can be trackable/opened again
+              {t('taskDeleteHasSubTask')}
             </div>
             :
             <div>
-              Are you sure you want to delete
+              {t('deleteConfirmation')}
             </div>
         }
         <DialogFooter className='flex justify-between'>
             <Button onClick={closeModal} variant='outline'>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button onClick={handleDeleteTask} variant='destructive'>
-              Delete Task
+              {t('deleteTask')}
             </Button>
 
         </DialogFooter>

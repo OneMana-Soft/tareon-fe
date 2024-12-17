@@ -1,36 +1,11 @@
-// type CreateOrUpdateTaskInput struct {
-// 	UUID            string                           `json:"task_uuid,omitempty"`
-// 	TaskName        string                           `json:"task_name,omitempty"`
-// 	TaskDescription string                           `json:"task_description,omitempty"`
-// 	DueDate         string                           `json:"task_due_date,omitempty"`
-// 	ProjectUUID     string                           `json:"task_project_uuid,omitempty"`
-// 	AssigneeUUID    string                           `json:"task_assignee_uuid,omitempty"`
-// 	Attachments     []*dgraphStruct.DgraphAttachment `json:"task_attachments,omitempty"`
-// }
-
 import profileService, { UserProfileDataInterface } from "@/services/ProfileService.ts";
 import axiosInstance from "@/utils/AxiosInstance.ts";
 import useSWR from "swr";
 import { AttachmentMediaReq } from "./MediaService";
-import {ProjectInfoInterface} from "@/services/ProjectService.ts";
+import projectService, {ProjectInfoInterface} from "@/services/ProjectService.ts";
 import {TeamInfoInterface} from "@/services/TeamService.ts";
-import * as url from "node:url";
 
 
-// comment_uuid
-// comment_html_text
-// comment_attachments {
-//   attachment_uuid
-//   attachment_obj_key
-//   attachment_file_name
-// }
-// comment_created_by {
-//   user_uuid
-//   user_name
-//   user_profile_object_key
-// }
-// comment_creeated_at
-// comment_updated_at
 
 export interface CommentInfoInterface {
   comment_uuid: string
@@ -104,12 +79,7 @@ class TaskService {
     return fetcher;
   }
 
-  private static getTaskListFetcher(url: string): Promise<TaskInfoListRawInterface> {
-    const fetcher: Promise<TaskInfoListRawInterface> = axiosInstance
-        .get(url)
-        .then((response) => response.data);
-    return fetcher;
-  }
+
 
   static getUserAssignedTaskList(ulrParam: string) {
     const { data, error, isLoading, mutate } = useSWR(
@@ -124,6 +94,21 @@ class TaskService {
       mutate: mutate,
     };
   }
+
+  static getProjectTaskList(id:string, ulrParam: string) {
+    const { data, error, isLoading, mutate } = useSWR(
+        (id != '' && ulrParam!='' && ulrParam != undefined ?`/api/project/taskList/${id}?${ulrParam}`:null),
+        projectService.getProjectFetcher
+    );
+
+    return {
+      projectData: data,
+      isLoading,
+      isError: error,
+      mutate: mutate,
+    };
+  }
+
 
   static getTaskInfo(id: string) {
     const { data, error, isLoading, mutate } = useSWR(

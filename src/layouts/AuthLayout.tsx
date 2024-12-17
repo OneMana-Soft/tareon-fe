@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,7 +10,7 @@ import { Search } from "@/components/nav/search";
 import { UserNav } from "@/components/nav/user-nav";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Nav } from "@/components/nav/nav";
-import { CircleCheck, ClipboardList, Home, MessageCircle, Users } from 'lucide-react';
+import {CircleCheck, ClipboardList, Home, LucideIcon, Shield, Users} from 'lucide-react';
 import CreateTaskDialog from "@/components/dialog/createTaskDialog";
 import CreateTeamDialog from "@/components/dialog/createTeamDialog";
 import CreateProjectDialog from "@/components/dialog/createProjectDialog";
@@ -26,62 +26,141 @@ import {
   closeCreateTeamPopup,
   closeCreteTaskDeletePopup,
   closeEditProfilePopup,
+  closeEditProjectMemberPopup,
+  closeEditProjectNamePopup,
+  closeEditTeamNamePopup,
+  closeOtherUserProfilePopup,
   closeSideBarTaskInfo,
+  openCreateProjectPopup,
+  openCreateTeamPopup,
 } from "@/store/slice/popupSlice";
-import { URL_HOME, URL_TASKS } from "@/constants/routes/appNavigation";
+import {URL_ADMIN, URL_HOME, URL_PROJECT, URL_TASKS, URL_TEAM} from "@/constants/routes/appNavigation";
+import profileService from "@/services/ProfileService.ts";
+import EditProjectNameDialog from "@/components/dialog/editProjectNameDialog.tsx";
+import ProjectMemberDialog from "@/components/dialog/projectMembersDialog.tsx";
+import EditTeamNameDialog from "@/components/dialog/editTeamNameDialog.tsx";
+import adminService from "@/services/AdminService.ts";
+import {useTranslation} from "react-i18next";
+import i18n from "@/utils/i18n"
+
+interface navGroup {
+  title: string;
+  path: string
+  variant?: "default" | "ghost";
+}
 
 type Props = {
   children: React.ReactNode;
 };
+
+interface navLink {
+  title: string;
+  label?: string;
+  icon?: LucideIcon;
+  variant?: "default" | "ghost";
+  path?: string;
+  action?:(()=>void)|undefined
+  isOpen?: boolean;
+  setIsOpen?:(b:boolean)=>void
+      children?:navGroup[]
+}
 
 const AuthLayout = ({ children }: Props) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const dispatch = useDispatch();
   const location = useLocation();
   const popupState = useSelector((state: RootState) => state.popup);
+  const {t} = useTranslation()
+
+  const userAdminProfile = adminService.getSelfAdminProfile()
 
   const navCollapsedSize = 4;
 
-  const isTabActive = (tabUrl: string) => location.pathname.startsWith(tabUrl);
+  const projectNavGrp = [] as navGroup[]
+  const teamNavGrp = [] as navGroup[]
 
-  const navLinks = [
+  const [isProjectOpen, setIsProjectOpen] = useState(true);
+  const [isTeamOpen, setIsTeamOpen] = useState(true);
+
+  const userInfo = profileService.getSelfUserProfile()
+  const path = location.pathname.split("/");
+
+
+  useEffect(() => {
+    if(userInfo.userData?.data.user_app_lang) {
+      i18n.changeLanguage(userInfo.userData?.data.user_app_lang)
+    }
+
+  }, [userInfo.userData]);
+  
+  for (const p of userInfo.userData?.data.user_projects||[]) {
+    projectNavGrp.push({
+      title: p.project_name,
+      path: `${URL_PROJECT}/${p.project_uuid}`,
+      variant: path[2] && path[2]==p.project_uuid? "default" : "ghost",
+    })
+  }
+
+  for (const t of userInfo.userData?.data.user_teams||[]) {
+    teamNavGrp.push({
+      title: t.team_name,
+      path: `${URL_TEAM}/${t.team_uuid}`,
+      variant: path[2] && path[2]==t.team_uuid? "default" : "ghost",
+    })
+  }
+
+  const isTabActive = (tabUrl: string) => path[1] && path[1]==tabUrl.substring(1);
+  const isAdmin = userAdminProfile.data && userAdminProfile.data.data.is_admin
+
+  const navLinks:navLink[] = [
     {
-      title: "Home",
+      title: t('home'),
       label: "",
       icon: Home,
       variant: isTabActive(URL_HOME) ? "default" : "ghost",
       path: "/home",
     },
     {
-      title: "My Tasks",
-      label: "9",
+      title: t('myTasks'),
+      label: "",
       icon: CircleCheck,
       variant: isTabActive(URL_TASKS) ? "default" : "ghost",
       path: "/tasks",
-    },
-    {
-      title: "Messages",
-      label: "",
-      icon: MessageCircle,
-      variant: "ghost",
-      path: "#",
-    },
+    }
   ];
 
-  const secondaryNavLinks = [
+  if(isAdmin) {
+    navLinks.push({
+      title: t('admin'),
+      label: "",
+      icon: Shield,
+      variant: isTabActive(URL_ADMIN) ? "default" : "ghost",
+      path: "/admin",
+    })
+  }
+
+  const secondaryNavLinks:navLink[] = [
     {
-      title: "Projects",
+      title: t('projects'),
       label: "972",
       icon: ClipboardList,
       variant: "ghost",
       path: "#",
+      action: ()=>{dispatch(openCreateProjectPopup())},
+      isOpen: isProjectOpen,
+      setIsOpen: setIsProjectOpen,
+      children: projectNavGrp
     },
     {
-      title: "Teams",
+      title: t('teams'),
       label: "342",
       icon: Users,
       variant: "ghost",
       path: "#",
+      action: isAdmin ? ()=>{dispatch(openCreateTeamPopup())} : undefined,
+      isOpen: isTeamOpen,
+      setIsOpen: setIsTeamOpen,
+      children: teamNavGrp
     },
   ];
 
@@ -90,7 +169,7 @@ const AuthLayout = ({ children }: Props) => {
         <TooltipProvider delayDuration={0}>
           <header className="border-b">
             <div className="flex h-16 items-center px-4">
-              <NavCreate />
+              <NavCreate isAdmin={isAdmin||false} />
               <div className="ml-auto flex items-center space-x-4">
                 <Search />
                 <UserNav />
@@ -148,7 +227,7 @@ const AuthLayout = ({ children }: Props) => {
               dialogOpenState={popupState.editProfileDialog.isOpen}
           />
           <OtherProfileDialog
-              setOpenState={() => dispatch(closeEditProfilePopup())}
+              setOpenState={() => dispatch(closeOtherUserProfilePopup())}
               dialogOpenState={popupState.otherUserProfilePopup.isOpen}
               userUUID={popupState.otherUserProfilePopup.data.userId}
           />
@@ -162,6 +241,21 @@ const AuthLayout = ({ children }: Props) => {
               sideBarOpenState={popupState.taskInfoSideBar.isOpen}
               setOpenState={() => dispatch(closeSideBarTaskInfo())}
               taskUUID={popupState.taskInfoSideBar.data.taskId}
+          />
+          <EditProjectNameDialog
+              dialogOpenState={popupState.editProjectNameDialog.isOpen}
+              setOpenState={() => dispatch(closeEditProjectNamePopup())}
+              projectId={popupState.editProjectNameDialog.data.projectId}
+          />
+          <ProjectMemberDialog
+              dialogOpenState={popupState.editProjectMemberDialog.isOpen}
+              setOpenState={() => dispatch(closeEditProjectMemberPopup())}
+              projectId={popupState.editProjectMemberDialog.data.projectId}
+          />
+          <EditTeamNameDialog
+              dialogOpenState={popupState.editTeamNameDialog.isOpen}
+              setOpenState={() => dispatch(closeEditTeamNamePopup())}
+              teamId={popupState.editTeamNameDialog.data.teamId}
           />
           <Toaster />
         </TooltipProvider>

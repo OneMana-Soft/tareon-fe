@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-interface modalChannelIdDataInterface {
-  channelId: string;
+interface modalEditProjectInterface {
+  projectId: string;
+}
+interface modalEditTeamInterface {
+  teamId: string;
 }
 
 interface modalUserIdDataInterface {
@@ -16,16 +19,15 @@ interface taskDeleteAlertInterface {
 interface sideBarTaskInfoInterface{
   taskId: string
 }
-interface modalAlertMsgInterface {
-  msg: string;
-  msgTitle: string;
-  btnText: string;
-}
+
 
 const initialState = {
   createTaskDialog: { isOpen: false },
   createTeamDialog: { isOpen: false },
   createProjectDialog: { isOpen: false },
+  editProjectNameDialog: { isOpen: false, data: { projectId: "" } },
+  editTeamNameDialog: { isOpen: false, data: { teamId: "" } },
+  editProjectMemberDialog: { isOpen: false, data: { projectId: "" } },
   otherUserProfilePopup: { isOpen: false, data: { userId: "" } },
   createChannelPopup: { isOpen: false },
   taskInfoSideBar: { isOpen: false, data: { taskId: "" } },
@@ -34,7 +36,7 @@ const initialState = {
     isOpen: false,
     data: { msg: "", msgTitle: "", btnText: "" },
   },
-  editProfileDialog: { isOpen: false },
+  editProfileDialog: { isOpen: false},
 };
 
 export const popupSlice = createSlice({
@@ -123,6 +125,50 @@ export const popupSlice = createSlice({
       state.createTaskDeleteAlertDialog = initialState.createTaskDeleteAlertDialog;
     },
 
+    openEditProjectNamePopup: (
+        state,
+        action: { payload: modalEditProjectInterface }
+    ) => {
+      state.editProjectNameDialog = {
+        isOpen: true,
+        data: action.payload,
+      };
+    },
+
+
+    closeEditProjectNamePopup: (state) => {
+      state.editProjectNameDialog = initialState.editProjectNameDialog;
+    },
+
+    openEditTeamNamePopup: (
+        state,
+        action: { payload: modalEditTeamInterface }
+    ) => {
+      state.editTeamNameDialog = {
+        isOpen: true,
+        data: action.payload,
+      };
+    },
+
+
+    closeEditTeamNamePopup: (state) => {
+      state.editTeamNameDialog = initialState.editTeamNameDialog;
+    },
+
+    openEditProjectMemberPopup: (
+        state,
+        action: { payload: modalEditProjectInterface }
+    ) => {
+      state.editProjectMemberDialog = {
+        isOpen: true,
+        data: action.payload,
+      };
+    },
+
+    closeEditProjectMemberPopup: (state) => {
+      state.editProjectMemberDialog = initialState.editProjectMemberDialog;
+    },
+
   },
 });
 
@@ -140,7 +186,13 @@ export const {
   openOtherUserProfilePopup,
   closeOtherUserProfilePopup,
   openCreteTaskDeletePopup,
-  closeCreteTaskDeletePopup
+  closeCreteTaskDeletePopup,
+  openEditProjectNamePopup,
+  closeEditProjectNamePopup,
+  openEditProjectMemberPopup,
+  closeEditProjectMemberPopup,
+  openEditTeamNamePopup,
+  closeEditTeamNamePopup
 } = popupSlice.actions;
 
 export default popupSlice;

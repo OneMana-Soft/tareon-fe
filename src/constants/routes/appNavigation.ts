@@ -1,6 +1,7 @@
 //protected
 export const URL_TASKS = "/tasks";
-export const URL_CHATS = "/chat";
+export const URL_PROJECT = "/project";
+export const URL_TEAM = "/team";
 export const URL_ACTIVITY = "/activity";
 export const URL_SEARCH = "/search";
 

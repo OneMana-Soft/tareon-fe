@@ -1,16 +1,7 @@
-import React, {useCallback} from 'react';
-import { useDraggable } from '@dnd-kit/core';
-import { TaskInfoInterface } from "@/services/TaskService.ts";
-import {isZeroEpoch, removeHtmlTags} from "@/utils/Helper.ts";
-import {ListFilter, Pencil} from "lucide-react";
+import {ListFilter} from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
-import {useDispatch} from "react-redux";
-import {openSideBarTaskInfo} from "@/store/slice/popupSlice.ts";
-import {format} from "date-fns";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
-import {CheckIcon, PlusCircledIcon} from "@radix-ui/react-icons";
-import {Separator} from "@/components/ui/separator.tsx";
-import {Badge} from "@/components/ui/badge.tsx";
+import {CheckIcon} from "@radix-ui/react-icons";
 import {
     Command,
     CommandEmpty,
@@ -22,6 +13,7 @@ import {
 } from "@/components/ui/command.tsx";
 import {cn} from "@/lib/utils.ts";
 import {priorities} from "@/components/task/data.tsx";
+import {useTranslation} from "react-i18next";
 
 type TaskCardProps = {
     activeList: string[];
@@ -30,6 +22,7 @@ type TaskCardProps = {
 
 export function TaskKanbanColumnPriorityFilter({ activeList, updateList}: TaskCardProps) {
 
+    const {t} = useTranslation()
 
 
     return (
@@ -90,7 +83,7 @@ export function TaskKanbanColumnPriorityFilter({ activeList, updateList}: TaskCa
                                         onSelect={() => updateList([])}
                                         className="justify-center text-center"
                                     >
-                                        Clear filters
+                                        {t('clearFilters')}
                                     </CommandItem>
                                 </CommandGroup>
                             </>

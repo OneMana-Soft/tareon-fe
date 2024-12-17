@@ -2,6 +2,7 @@ import { Outlet, Navigate } from "react-router-dom";
 import { URL_LOGIN } from "../constants/routes/appNavigation";
 import profileService from "../services/ProfileService.ts";
 import { checkRefreshCookieExists } from "@/utils/Helper.ts";
+import {Loader2} from "lucide-react";
 
 function ProtectedRoutes() {
   //   const selector = useSelector((state) => state.user);
@@ -18,7 +19,7 @@ function ProtectedRoutes() {
   const { userData, isLoading, isError } = profileService.getSelfUserProfile();
 
   if (isLoading) {
-    return <div>LOADING</div>;
+    return <div className='flex justify-center items-center h-[100vh] space-x-3'><Loader2 className="size-10 animate-spin"/></div>;
   }
 
   return (

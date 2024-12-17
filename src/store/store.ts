@@ -7,6 +7,8 @@ import mentionSlice from "@/store/slice/mentionSlice.ts";
 import {createTaskDialogSlice} from "@/store/slice/createTaskDailogSlice.ts";
 import {createTaskCommentSlice} from "@/store/slice/createTaskCommentSlice.ts";
 import {taskInfoSlice} from "@/store/slice/TaskInfoSlice.ts";
+import {projectAttachmentSlice} from "@/store/slice/projectAttachmentSlice.ts";
+import globalSearchSlice from "@/store/slice/globalSearchSlice.ts";
 
 
 const rootPersistConfig = {
@@ -26,7 +28,9 @@ const rootReducer = combineReducers({
     [taskInfoSlice.name]: taskInfoSlice.reducer,
     [popupSlice.name]: popupSlice.reducer,
     [mentionSlice.name]: mentionSlice.reducer,
-    [createTaskDialogSlice.name]: createTaskDialogSlice.reducer
+    [createTaskDialogSlice.name]: createTaskDialogSlice.reducer,
+    [projectAttachmentSlice.name]: projectAttachmentSlice.reducer,
+    [globalSearchSlice.name]: globalSearchSlice.reducer,
 
 });
 
