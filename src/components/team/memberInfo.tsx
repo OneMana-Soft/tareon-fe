@@ -41,8 +41,8 @@ const MemberInfo: React.FC<MemberPropInfoInterface> = ({
     };
 
     return (
-        <div className='grid grid-cols-3 gap-4 items-center h-16 w-full'>
-            <div className='flex items-center space-x-3'>
+        <div className='grid grid-cols-6 gap-4 items-center h-16 w-full'>
+            <div className='flex items-center col-span-4 space-x-3'>
                 <Avatar className="h-12 w-12 flex-shrink-0">
                     <AvatarImage
                         src={profileImageRes.mediaData?.url || ""}
