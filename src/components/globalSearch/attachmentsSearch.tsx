@@ -19,6 +19,7 @@ import {useToast} from "@/hooks/use-toast.ts";
 import {SearchTaskAttachmentRow} from "@/components/globalSearch/SearchTaskAttachmentRow.tsx";
 import {SearchProjectAttachmentRow} from "@/components/globalSearch/searchProjectAttachmentRow.tsx";
 import {useTranslation} from "react-i18next";
+import {LoaderCircle} from "lucide-react";
 
 export function AttachmentResult() {
 
@@ -91,7 +92,11 @@ export function AttachmentResult() {
                     </TableHeader>
                     <TableBody>
                         {!searchAttachmentInfo.data?.data && <TableRow>
-                            <TableCell colSpan={4} className='h-24 text-center'>{t('noResult')}</TableCell>
+                            <TableCell colSpan={4} className='h-24 text-center'>{searchAttachmentInfo.isLoading ?
+                                <div className="flex items-center justify-center">
+                                    <LoaderCircle className="h-4 w-4 animate-spin"/>
+                                </div>
+                                : t('noResultFound')}</TableCell>
                         </TableRow>}
                         {searchAttachmentInfo.data?.data && searchAttachmentInfo.data?.data.map((d, i) => {
 

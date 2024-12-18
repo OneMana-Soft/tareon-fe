@@ -17,6 +17,7 @@ import {openSideBarTaskInfo} from "@/store/slice/popupSlice.ts";
 import {useNavigate} from "react-router-dom";
 import {URL_PROJECT} from "@/constants/routes/appNavigation.ts";
 import {useTranslation} from "react-i18next";
+import {LoaderCircle} from "lucide-react";
 
 
 export function TaskResult() {
@@ -70,7 +71,11 @@ export function TaskResult() {
                     </TableHeader>
                     <TableBody>
                         {!searchTaskAndCommentInfo.data?.data && <TableRow>
-                            <TableCell colSpan={5} className='h-24 text-center'>{t('noResult')}</TableCell>
+                            <TableCell colSpan={5} className='h-24 text-center'>{searchTaskAndCommentInfo.isLoading ?
+                                <div className="flex items-center justify-center">
+                                    <LoaderCircle className="h-4 w-4 animate-spin"/>
+                                </div>
+                                : t('noResultFound')}</TableCell>
                         </TableRow>}
                         {searchTaskAndCommentInfo.data?.data && searchTaskAndCommentInfo.data?.data.map((d, i) => (
                             <TableRow key={i} >

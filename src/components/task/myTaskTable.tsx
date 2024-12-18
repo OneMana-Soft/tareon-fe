@@ -162,11 +162,13 @@ export const MyTaskTable = () => {
                   <TableRow>
                     <TableCell
                         colSpan={columns.length}
-                        className="h-24 text-center flex justify-center items-center"
+                        className="h-24 text-center items-center"
                     >
                       {isLoading ?
-                          <LoaderCircle className="mr-2 h-4 w-4 animate-spin"/>
-                          : t('noResultFound')}
+                          <div className="flex items-center justify-center">
+                            <LoaderCircle className="h-4 w-4 animate-spin"/>
+                          </div>
+                        : t('noResultFound')}
                     </TableCell>
                   </TableRow>
               )}

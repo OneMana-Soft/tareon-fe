@@ -16,6 +16,7 @@ import {useNavigate} from "react-router-dom";
 import {URL_PROJECT, URL_TEAM} from "@/constants/routes/appNavigation.ts";
 import {SearchProjectRow} from "@/components/globalSearch/searchProjectRow.tsx";
 import {useTranslation} from "react-i18next";
+import {LoaderCircle} from "lucide-react";
 
 export function ProjectResult() {
 
@@ -57,7 +58,11 @@ export function ProjectResult() {
                     </TableHeader>
                     <TableBody>
                         {!searchTaskAndCommentInfo.data?.data && <TableRow>
-                            <TableCell colSpan={2} className='h-24 text-center'>No result</TableCell>
+                            <TableCell colSpan={2} className='h-24 text-center'>{searchTaskAndCommentInfo.isLoading ?
+                                <div className="flex items-center justify-center">
+                                    <LoaderCircle className="h-4 w-4 animate-spin"/>
+                                </div>
+                                : t('noResultFound')}</TableCell>
                         </TableRow>}
                         {searchTaskAndCommentInfo.data?.data && searchTaskAndCommentInfo.data?.data.map((d, i) => (
                             <TableRow key={i} >
