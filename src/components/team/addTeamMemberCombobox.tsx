@@ -42,7 +42,7 @@ const AddTeamMemberCombobox: React.FC<AddTeamMemberComboboxPropInterface> = ({ha
                     size="sm"
                 >
                     {value
-                        ? usersList.userData?.data.find((framework) => framework.user_name === value)?.user_name
+                        ? usersList.userData?.data.find((framework) => framework.user_uuid === value)?.user_name
                         : t('selectUser')}
                     <ChevronsUpDown className="opacity-50" />
                 </Button>

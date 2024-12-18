@@ -118,13 +118,13 @@ class TeamService {
 
   static addTeamMember(createTeamBody: CreateOrUpdateTeamInfo) {
     return axiosInstance
-        .post("/api/team/addMember", createTeamBody)
+        .put("/api/team/addMember", createTeamBody)
         .then((res) => res);
   }
 
   static addAdminTeamMember(createTeamBody: CreateOrUpdateTeamInfo) {
     return axiosInstance
-        .post("/api/team/addAdminRole", createTeamBody)
+        .put("/api/team/addAdminRole", createTeamBody)
         .then((res) => res);
   }
 
