@@ -4,11 +4,29 @@ import { ModeToggle } from "@/components/mode-toggle";
 import {Github, LoaderCircle} from "lucide-react";
 import * as React from "react";
 import authService from "@/services/AuthService.ts";
+import {useDispatch, useSelector} from "react-redux";
+import {updateRefreshTokenStatus} from "@/store/slice/refreshSlice.ts";
+import {checkRefreshCookieExists} from "@/utils/Helper.ts";
+import {RootState} from "@/store/store.ts";
+import {Navigate} from "react-router-dom";
+import {URL_HOME} from "@/constants/routes/appNavigation.ts";
+import {useState} from "react";
 
 
 const LoginPage: React.FC = () => {
 
-    const [isLoading, setIsLoading] = React.useState<boolean>(false)
+    const dispatch = useDispatch();
+    dispatch(updateRefreshTokenStatus({exist: checkRefreshCookieExists()}))
+
+    const refreshTokenExist  = useSelector((state:RootState)=>state.refresh.exist)
+
+
+    if(refreshTokenExist) {
+        return ( <Navigate to={URL_HOME}/>)
+    }
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const handleLogin = async (action: () => Promise<void>) => {
         setIsLoading(true);
