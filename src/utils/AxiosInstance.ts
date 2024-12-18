@@ -29,7 +29,7 @@ axiosInstance.interceptors.request.use(async req => {
     }
 
     try {
-        await axios.get(`/api/refreshToken`, {
+        await axios.get(`${import.meta.env.VITE_BACKEND_URL}refreshToken`, {
             withCredentials: true
         });
     } catch(err) {
@@ -58,7 +58,7 @@ axiosInstance.interceptors.response.use(
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
 
             try {
-                await axios.get(`/api/refreshToken`, {
+                await axios.get(`${import.meta.env.VITE_BACKEND_URL}refreshToken`, {
                     withCredentials: true
                 });
                 store.dispatch(updateRefreshTokenStatus({exist: true}))
