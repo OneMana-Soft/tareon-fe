@@ -718,8 +718,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
 
   const updateTaskDesc = async (taskDesc: string) => {
 
-
-    if(taskDesc == taskInfo.taskData?.data.task_description || taskInfo.isLoading || (taskDesc == '' && taskInfo.taskData?.data.task_description == undefined)){
+    if(!taskInfo.taskData || taskDesc === taskInfo.taskData?.data.task_description || taskInfo.isLoading || (taskDesc == '' && taskInfo.taskData?.data.task_description == undefined)){
       return
     }
 
