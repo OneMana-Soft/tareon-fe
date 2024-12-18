@@ -35,6 +35,8 @@ const ProjectMemberDialog: React.FC<createTaskDialogProps> = ({
 
   const projectInfo = projectService.getProjectMemberList(projectId)
   const selfProfile = profileService.getSelfUserProfile()
+  const usersList = profileService. usersListWhoDontBelongToTheProjectButBelongToTheTeam(projectId||'')
+
   const [query, setQuery] = useState('')
   const {t} = useTranslation()
 
@@ -106,6 +108,8 @@ const ProjectMemberDialog: React.FC<createTaskDialogProps> = ({
         description: t('addedProjectMember'),
       });
       await projectInfo.Mutate()
+      await usersList.mutate()
+
 
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : TOAST_UNKNOWN_ERROR;
@@ -127,6 +131,8 @@ const ProjectMemberDialog: React.FC<createTaskDialogProps> = ({
         description: t('removeProjectMember'),
       });
       await projectInfo.Mutate()
+      await usersList.mutate()
+
 
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : TOAST_UNKNOWN_ERROR;
@@ -157,7 +163,7 @@ const ProjectMemberDialog: React.FC<createTaskDialogProps> = ({
         <div className='flex-col space-y-4'>
 
           <div>
-            {isAdmin && <AddProjectMemberCombobox handleAddMember={handleAddMember} />}
+            {isAdmin && <AddProjectMemberCombobox handleAddMember={handleAddMember} projectId={projectId}/>}
           </div>
           <div>
 

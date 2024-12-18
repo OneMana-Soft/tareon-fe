@@ -173,7 +173,7 @@ class ProjectService {
 
   static AddAdminRole(updateProjectBody: CreateOrUpdateProjectInfo) {
     return axiosInstance
-        .put("/api/project/updateName", updateProjectBody)
+        .put("/api/project/addAdminRole", updateProjectBody)
         .then((res) => res);
   }
 
