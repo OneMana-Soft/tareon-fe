@@ -26,7 +26,7 @@ const MemberInfo: React.FC<MemberPropInfoInterface> = ({
     const nameInitial = getNameInitials(userInfo.user_name);
 
     const handleCrownClick = () => {
-        if (isSelf) return;
+        if ( !isAdmin) return;
         if (userInfo.user_is_admin) {
             handleRemoveAdmin(userInfo.user_uuid);
         } else {
@@ -59,7 +59,7 @@ const MemberInfo: React.FC<MemberPropInfoInterface> = ({
             <div className='flex justify-center'>
                 {(userInfo.user_is_admin || isAdmin) && (
                     <Crown
-                        className={`size-5 ${!isSelf ? "cursor-pointer" : ""}`}
+                        className={`size-5 ${(!isSelf &&isAdmin )? "cursor-pointer" : ""}`}
                         fill={userInfo.user_is_admin ? '#facc15' : 'none'}
                         onClick={handleCrownClick}
                     />

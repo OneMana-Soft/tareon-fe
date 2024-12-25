@@ -38,6 +38,16 @@ export interface CreateTaskInterface {
   task_attachments?: AttachmentMediaReq[];
 }
 
+export interface TaskActivityInterface {
+  activity_uuid?: string;
+  activity_by: UserProfileDataInterface
+  activity_type: string
+  activity_time: string
+  activity_prev_state: string
+  activity_next_state: string
+
+}
+
 export interface TaskInfoInterface {
   uid: string;
   task_uuid: string;
@@ -52,6 +62,7 @@ export interface TaskInfoInterface {
   task_deleted_at: string;
   task_comments: CommentInfoInterface[]
   task_description: string;
+  task_activities: TaskActivityInterface[]
   task_assignee: UserProfileDataInterface;
   task_collaborators: UserProfileDataInterface[];
   task_due_date: string;
@@ -227,6 +238,34 @@ class TaskService {
     return axiosInstance
         .put(`/api/task/undeleteTask/${id}`)
         .then((res) => res);
+  }
+
+  static getTaskActivityInfo(taskId: string, activityId: string) {
+    const { data, error, isLoading, mutate } = useSWR(
+        ((activityId!=='' && taskId!=='') ?`/api/task/getTaskActivityInfo/${taskId}/${activityId}`:null),
+        TaskService.getTaskFetcher
+    );
+
+    return {
+      taskData: data,
+      isLoading,
+      isError: error,
+      mutate: mutate,
+    };
+  }
+
+  static getTaskActivityList(id: string) {
+    const { data, error, isLoading, mutate } = useSWR(
+        (id!=='' ?`/api/task/getTaskActivityList/${id}`:null),
+        TaskService.getTaskFetcher
+    );
+
+    return {
+      taskData: data,
+      isLoading,
+      isError: error,
+      mutate: mutate,
+    };
   }
 
 }

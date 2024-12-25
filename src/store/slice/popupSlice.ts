@@ -3,6 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 interface modalEditProjectInterface {
   projectId: string;
 }
+
+interface modalEditTeamInterface {
+  teamId: string;
+}
 interface modalEditTeamInterface {
   teamId: string;
 }
@@ -29,6 +33,7 @@ const initialState = {
   editTeamNameDialog: { isOpen: false, data: { teamId: "" } },
   editProjectMemberDialog: { isOpen: false, data: { projectId: "" } },
   otherUserProfilePopup: { isOpen: false, data: { userId: "" } },
+  editTeamMemberDialog: { isOpen: false, data: { teamId: "" } },
   createChannelPopup: { isOpen: false },
   taskInfoSideBar: { isOpen: false, data: { taskId: "" } },
   createTaskDeleteAlertDialog: { isOpen: false, data: { taskUUID: "" , hasSubTasks:false} },
@@ -169,6 +174,20 @@ export const popupSlice = createSlice({
       state.editProjectMemberDialog = initialState.editProjectMemberDialog;
     },
 
+    openEditTeamMemberPopup: (
+        state,
+        action: { payload: modalEditTeamInterface }
+    ) => {
+      state.editTeamMemberDialog = {
+        isOpen: true,
+        data: action.payload,
+      };
+    },
+
+    closeEditTeamMemberPopup: (state) => {
+      state.editTeamMemberDialog = initialState.editTeamMemberDialog;
+    },
+
   },
 });
 
@@ -192,7 +211,9 @@ export const {
   openEditProjectMemberPopup,
   closeEditProjectMemberPopup,
   openEditTeamNamePopup,
-  closeEditTeamNamePopup
+  closeEditTeamNamePopup,
+  openEditTeamMemberPopup,
+  closeEditTeamMemberPopup
 } = popupSlice.actions;
 
 export default popupSlice;

@@ -44,7 +44,7 @@ class TeamService {
     return fetcher;
   }
 
-  private static getTeamListFetcher(
+  static getTeamListFetcher(
     url: string
   ): Promise<TeamInfoListRawInterface> {
     const fetcher: Promise<TeamInfoListRawInterface> = axiosInstance

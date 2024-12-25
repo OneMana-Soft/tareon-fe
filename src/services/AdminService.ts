@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import axiosInstance from '../utils/AxiosInstance.ts';
 import profileService from "@/services/ProfileService.ts";
+import teamService from "@/services/TeamService.ts";
 
 
 export interface PostgresUserInterface {
@@ -83,6 +84,21 @@ class AdminService {
         };
     }
 
+    static getAllTeamsList() {
+
+        const { data, error, mutate, isLoading } = useSWR(
+            `/api/admin/getAllTeamList`,
+            teamService.getTeamListFetcher
+        );
+
+        return {
+            mutate,
+            data,
+            isLoading,
+            isError: error,
+        };
+    }
+
     static createAdmin(createAdminBody: CreateAndUpdateAdminInterface) {
         return axiosInstance
             .post("/api/admin/createAdmin", createAdminBody)
@@ -104,6 +120,18 @@ class AdminService {
     static activateUser(removeUserBody: CreateAndUpdateAdminInterface) {
         return axiosInstance
             .put("/api/admin/activateUser", removeUserBody)
+            .then((res) => res);
+    }
+
+    static deleteTeam(id: string) {
+        return axiosInstance
+            .delete(`/api/admin/deleteTeam/${id}`)
+            .then((res) => res);
+    }
+
+    static unDeleteTeam(id: string) {
+        return axiosInstance
+            .put(`/api/admin/unDeleteTeam/${id}`)
             .then((res) => res);
     }
 

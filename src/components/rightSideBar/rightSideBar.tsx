@@ -1,12 +1,13 @@
 import React, {useState, useEffect, Fragment, useRef, useCallback} from "react";
 import {
+  Activity,
   ArrowRightToLine,
   Calendar as CalenderIcon,
   Check,
   ChevronRight, ChevronsUpDown,
   CircleCheck,
   CirclePlus, EllipsisVertical,
-  GripVertical, Maximize2, Minimize2, Trash, Trash2,
+  GripVertical,  Maximize2, MessageSquare, Minimize2, Trash, Trash2,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { Separator } from "../ui/separator";
 import { Label } from "../ui/label";
 import MinimalTiptapTask from "../textInput/textInput";
 import { Content } from "node_modules/@tiptap/core/dist/types";
+import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input.tsx";
 import { Transition } from "@headlessui/react";
@@ -27,7 +29,6 @@ import profileService, {UserProfileDataInterface} from "@/services/ProfileServic
 import {TOAST_UNKNOWN_ERROR} from "@/constants/dailog/const.tsx";
 import {useToast} from "@/hooks/use-toast.ts";
 import {isZeroEpoch} from "@/utils/Helper.ts";
-import {useThrottle} from "@/components/minimal-tiptap/hooks/use-throttle.ts";
 import {format} from "date-fns";
 import {Calendar} from "@/components/ui/calendar.tsx";
 import {prioritiesInterface, statuses, priorities} from "@/components/task/data.tsx";
@@ -35,7 +36,6 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip.t
 import SubTaskAssignee from "@/components/rightSideBar/subTaskAssignee.tsx";
 import ResizeableTextInput from "@/components/resizeableTextInput/resizeableTextInput.tsx";
 import {openCreteTaskDeletePopup, openSideBarTaskInfo} from "@/store/slice/popupSlice.ts";
-import TaskComment from "@/components/rightSideBar/taskComment.tsx";
 import AttachmentIcon from "@/components/attachmentIcon/attachmentIcon.tsx";
 import TaskAttachment from "@/components/rightSideBar/taskAttachment.tsx";
 import {
@@ -66,11 +66,19 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 import {useTranslation} from "react-i18next";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
+import {TaskCommentSection} from "@/components/rightSideBar/taskCommentSection.tsx";
+import TaskActivitySection from "@/components/rightSideBar/taskActivitySection.tsx";
 
 interface OtherUserProfileModalProps {
   sideBarOpenState: boolean;
   setOpenState: (state: boolean) => void;
   taskUUID: string;
+}
+
+interface updateTaskNameInterface {
+  taskUUID: string
+  taskName: string
 }
 
 interface subTaskInterface {
@@ -104,7 +112,13 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
   const [subTaskInfo, setSubTaskInfo] = useState<subTaskInterface | undefined>(undefined);
 
   const [taskLabelWidth, setTaskLabelWidth] = useState(0)
-  const [taskLabel, setTaskLabel] = useState(t('addLabel'));
+  const [taskLabel, setTaskLabel] = useState<string>(t('addLabel'));
+
+  const [taskName, setTaskName] = useState<updateTaskNameInterface>({} as updateTaskNameInterface)
+  const taskNameUpdateDebounce = useDebounce(taskName, 1000);
+
+  const [taskDescription, setTaskDescription] = useState<string>('');
+  const taskDescriptionDebounce = useDebounce(taskDescription, 1000);
 
   const [openTaskStatus, setOpenTaskStatus] = useState<boolean>(false)
   const [selectedStatus, setSelectedStatus] = useState<prioritiesInterface|undefined>(undefined)
@@ -114,8 +128,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
 
   const { toast } = useToast();
 
-  const throttledSetTaskLabel = useThrottle((value:React.ChangeEvent<HTMLInputElement>) => updateTaskLabel?.(value), 3000)
-
+  const taskLabelDebounce = useDebounce(taskLabel, 1000);
 
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
 
@@ -187,6 +200,8 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
   const handleTaskFileUpload = async (
       e: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    if(!isAdmin) return;
+
     const files = e.target.files;
     if (!files) return;
 
@@ -428,11 +443,11 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
       }
 
       setTaskLabel(taskInfo.taskData.data.task_label || '')
+      setTaskDescription(taskInfo.taskData.data.task_description || '')
 
     }
 
   }, [taskInfo.taskData?.data]);
-
 
   const startResizing = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsResizing(true);
@@ -511,10 +526,10 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
 
   const handleChangeTaskLabel= React.useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
+        if(t('addLabel') == e.target.value.trim()) return
         setTaskLabel(e.target.value.trim())
-        throttledSetTaskLabel(e)
       },
-      [throttledSetTaskLabel]
+      []
   )
 
   const updateTaskName = async (taskName: string, taskId: string) => {
@@ -546,12 +561,12 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
 
   }
 
-  const updateTaskLabel = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const taskLabel = e.target.value;
+  const updateTaskLabel = async (taskLabel: string) => {
 
+    if(!isAdmin || taskLabel == taskInfo.taskData?.data.task_label || (taskLabel.length == 0 && taskInfo.taskData)) return
 
     try {
-      await taskService.updateTaskLabel({task_uuid:taskUUID, task_label:taskLabel, task_project_uuid:taskInfo.taskData?.data.task_project.project_uuid})
+      await taskService.updateTaskLabel({task_uuid:taskUUID, task_label:taskLabel})
 
       toast({
         title: t('success'),
@@ -715,6 +730,22 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
 
     await taskInfo.mutate()
   }
+
+  useEffect(() => {
+    updateTaskDesc(taskDescriptionDebounce)
+  }, [taskDescriptionDebounce]);
+
+  useEffect(() => {
+    updateTaskLabel(taskLabelDebounce)
+  }, [taskLabelDebounce]);
+
+  useEffect(() => {
+
+    if(taskNameUpdateDebounce.taskName && taskNameUpdateDebounce.taskUUID && taskNameUpdateDebounce.taskName.length > 0 && taskNameUpdateDebounce.taskUUID.length > 0 ){
+      updateTaskName(taskNameUpdateDebounce.taskName, taskNameUpdateDebounce.taskUUID)
+    }
+
+  }, [taskNameUpdateDebounce]);
 
   const updateTaskDesc = async (taskDesc: string) => {
 
@@ -977,7 +1008,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                     delay={3000}
                     content={taskInfo.taskData?.data.task_name || ''}
                     textUpdate={(s: string) => {
-                      updateTaskName(s, taskUUID)
+                      setTaskName({taskName: s, taskUUID: taskUUID})
                     }}
                     className='text-3xl -ml-2'
                 />
@@ -1278,16 +1309,19 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
               <div className="grid gap-2 mb-4">
                 <Label>{t('description')}</Label>
                 <MinimalTiptapTask
-                    throttleDelay={3000}
+                    throttleDelay={300}
                     className={cn("h-full rounded-xl min-h-48")}
                     editorContentClassName="overflow-auto h-full"
                     output="html"
-                    value={taskInfo.taskData?.data.task_description}
+                    content={taskInfo.taskData?.data.task_description||''}
+                    value={taskInfo.taskData?.data.task_description||''}
                     placeholder={t('descriptionPlaceholder')}
                     editable={isAdmin}
                     editorClassName="focus:outline-none px-5 py-4 h-full"
                     onChange={(content: Content) => {
-                      updateTaskDesc(content?.toString() || '')
+                      if(!isAdmin) return
+
+                      setTaskDescription(content?.toString() || '')
 
                     }}
                 />
@@ -1295,11 +1329,12 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
               <div className='mb-2'>
                 <Label className='inline'>{t('attachments')}</Label>
               </div>
-              <Label htmlFor="file-upload-task" className="cursor-pointer text-sm  text-muted-foreground hover:underline">
+              {isAdmin &&
+                  <><Label htmlFor="file-upload-task" className="cursor-pointer text-sm  text-muted-foreground hover:underline">
                 {t('attachFiles')}
               </Label>
 
-              <Input
+               <Input
                   type="file"
                   id="file-upload-task"
                   multiple
@@ -1311,7 +1346,7 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                               .length)||
                       0
                   }
-              />
+              /></>}
 
               <div className="flex flex-wrap mb-4">
                 {taskInfo.taskData?.data.task_attachments &&
@@ -1384,11 +1419,11 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
                                     delay={3000}
                                     content={subTask.task_name}
                                     textUpdate={(s: string) => {
-                                      updateTaskName(s, subTask.task_uuid)
+                                      setTaskName({taskName: s, taskUUID: subTask.task_uuid})
                                     }}
                                     placeholder="Enter sub task name..."
                                     textUpdateOnEnter={(s: string) => {
-                                      updateTaskName(s, subTask.task_uuid)
+                                      setTaskName({taskName: s, taskUUID: subTask.task_uuid})
                                     }}
                                 />
                               </div>
@@ -1672,24 +1707,20 @@ const RightResizableSidebar: React.FC<OtherUserProfileModalProps> = ({
 
               <Separator orientation='horizontal'/>
               <div className='mt-4'>
-                <div className='mb-4'>
-                  <Label>{t('comments')}
-                    (<span>{taskInfo.taskData?.data?.task_comments ? taskInfo.taskData?.data.task_comments.length : '0'}</span>)</Label>
-                </div>
-
-                <div>
-                  {taskInfo.taskData?.data.task_comments && taskInfo.taskData?.data.task_comments
-                      .map((commentsInfo) => {
-                        return (<div className='pl-4 pr-4' key={commentsInfo.comment_uuid}>
-                          <Separator orientation='horizontal'/>
-                          <TaskComment
-                              commentInfo={commentsInfo} taskUUID={taskUUID}
-                              isOwner={userInfo.userData?.data.user_uuid == commentsInfo.comment_created_by.user_uuid}
-                              isAdmin={taskInfo.taskData?.data.task_project.project_is_admin || false}
-                          />
-                        </div>)
-                      })}
-                </div>
+                <Tabs defaultValue="comments" className="w-full ">
+                  <TabsList>
+                    <TabsTrigger value="comments">
+                      <MessageSquare className='h-4 w-4 mr-2'/>{t('comments')}
+                    </TabsTrigger>
+                    <TabsTrigger value="activities">
+                      <Activity className='h-4 w-4 mr-2'/>{t('activities')}
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="comments" className='p-4'><TaskCommentSection comments={taskInfo.taskData?.data.task_comments} taskUUID={taskUUID} userUUID={userInfo.userData?.data.user_uuid} isProjectAdmin={taskInfo.taskData?.data.task_project.project_is_admin}/></TabsContent>
+                  <TabsContent value="activities" className='p-4'>
+                    <TaskActivitySection  taskId={taskUUID}/>
+                  </TabsContent>
+                </Tabs>
               </div>
             </div>
           </div>

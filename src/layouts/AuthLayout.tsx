@@ -27,7 +27,7 @@ import {
   closeCreteTaskDeletePopup,
   closeEditProfilePopup,
   closeEditProjectMemberPopup,
-  closeEditProjectNamePopup,
+  closeEditProjectNamePopup, closeEditTeamMemberPopup,
   closeEditTeamNamePopup,
   closeOtherUserProfilePopup,
   closeSideBarTaskInfo,
@@ -42,6 +42,7 @@ import EditTeamNameDialog from "@/components/dialog/editTeamNameDialog.tsx";
 import adminService from "@/services/AdminService.ts";
 import {useTranslation} from "react-i18next";
 import i18n from "@/utils/i18n"
+import TeamMemberDialog from "@/components/dialog/teamMembersDialog.tsx";
 
 interface navGroup {
   title: string;
@@ -256,6 +257,11 @@ const AuthLayout = ({ children }: Props) => {
               dialogOpenState={popupState.editTeamNameDialog.isOpen}
               setOpenState={() => dispatch(closeEditTeamNamePopup())}
               teamId={popupState.editTeamNameDialog.data.teamId}
+          />
+          <TeamMemberDialog
+              dialogOpenState={popupState.editTeamMemberDialog.isOpen}
+              setOpenState={() => dispatch(closeEditTeamMemberPopup())}
+              teamId={popupState.editTeamMemberDialog.data.teamId}
           />
           <Toaster />
         </TooltipProvider>

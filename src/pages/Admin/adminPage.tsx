@@ -2,8 +2,7 @@ import React from "react";
 import AdminsCard from "@/components/admin/adminsCard.tsx";
 import UsersCard from "@/components/admin/usersCard.tsx";
 import {useTranslation} from "react-i18next";
-
-
+import TeamsCard from "@/components/admin/teamCard.tsx";
 
 
 const AdminPage: React.FC = () => {
@@ -23,9 +22,10 @@ const AdminPage: React.FC = () => {
                 </div>
 
 
-                <div className='flex gap-x-6'>
+                <div className='flex flex-wrap gap-x-6 gap-y-6'>
                     <AdminsCard />
                     <UsersCard/>
+                    <TeamsCard/>
                 </div>
 
 
