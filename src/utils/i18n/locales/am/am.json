@@ -210,6 +210,8 @@
   "members": "الأعضاء",
   "comments": "التعليقات",
   "comment": "تعليق",
-  "language": "لغة"
-
+  "language": "لغة",
+  "addedTaskAttachment": "تم إضافة مرفق(ات) إلى المهمة",
+  "subTaskDelete": "تم حذف المهمة الفرعية",
+  "subTaskUnDelete": "تم استعادة المهمة الفرعية"
 }

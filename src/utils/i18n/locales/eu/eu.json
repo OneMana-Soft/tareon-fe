@@ -210,5 +210,8 @@
   "members": "Kideak",
   "comments": "Iruzkinak",
   "comment": "Iruzkina",
-  "language": "Hizkuntza"
+  "language": "Hizkuntza",
+  "addedTaskAttachment": "Zereginari erantsiak gehitu zaizkio",
+  "subTaskDelete": "Azpizeregina ezabatu da",
+  "subTaskUnDelete": "Azpizeregina berreskuratu da"
 }

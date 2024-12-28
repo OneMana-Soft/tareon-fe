@@ -4,7 +4,7 @@ type TaskActivityKey = {
 
 export const taskActivityConst: Record<string, TaskActivityKey> = {
     "nameUpdate": {
-        "key": "updatedTaskName",
+        "key": "updatedTask",
     },
     "labelUpdate": {
         "key": "updatedTaskLabel",
@@ -13,13 +13,13 @@ export const taskActivityConst: Record<string, TaskActivityKey> = {
         "key": "updatedTaskStatus",
     },
     "priorityUpdate": {
-        "key": "updatedTaskPriority",
+        "key": "updateTaskPriority",
     },
     "assigneeUpdate": {
-        "key": "updatedTaskAssignee",
+        "key": "updateTaskAssignee",
     },
     "startDateUpdate": {
-        "key": "updatedTaskStartDate",
+        "key": "updateTaskStartDate",
     },
     "endDateUpdate": {
         "key": "updatedTaskDueDate",
@@ -31,10 +31,10 @@ export const taskActivityConst: Record<string, TaskActivityKey> = {
         "key": "addedTaskAttachment",
     },
     "attachmentRemove": {
-        "key": "removedTaskAttachment",
+        "key": "removedAttachment",
     },
     "subTaskAdd": {
-        "key": "addedTaskSubTask",
+        "key": "createSubTask",
     },
     "subTaskDelete": {
         "key": "deletedTaskSubTask",
@@ -44,22 +44,21 @@ export const taskActivityConst: Record<string, TaskActivityKey> = {
         "key": "unDeletedTaskSubTask",
     },
     "commentAdd": {
-        "key": "addedTaskComment",
+        "key": "addedCommentToTask",
     },
     "commentUpdate": {
-        "key": "updateTaskComment",
-
+        "key": "updatedTaskComment",
     },
     "commentDelete": {
-        "key": "deleteTaskComment",
+        "key": "deletedTaskComment",
     },
     "taskDelete": {
-        "key": "updateTaskDelete",
+        "key": "deletedTask",
     },
     "taskUnDelete": {
-        "key": "updateTaskUnDelete",
+        "key": "unrelatedTask",
     },
     "taskCreate": {
-        "key": "updateTaskCreate",
+        "key": "createTask",
     }
 };

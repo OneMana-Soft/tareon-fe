@@ -210,5 +210,8 @@
   "members": "Membres",
   "comments": "Commentaires",
   "comment": "Commentaire",
-  "language": "Langue"
+  "language": "Langue",
+  "addedTaskAttachment": "Pièce(s) jointe(s) ajoutée(s) à la tâche",
+  "subTaskDelete": "Sous-tâche supprimée",
+  "subTaskUnDelete": "Sous-tâche restaurée"
 }

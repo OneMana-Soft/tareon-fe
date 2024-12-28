@@ -210,5 +210,8 @@
   "members": "Medlemmer",
   "comments": "Kommentarer",
   "comment": "Kommentar",
-  "language": "Sprog"
+  "language": "Sprog",
+  "addedTaskAttachment": "Tilføjet vedhæftning(er) til opgave",
+  "subTaskDelete": "Slettet underopgave",
+  "subTaskUnDelete": "Gendannet underopgave"
 }

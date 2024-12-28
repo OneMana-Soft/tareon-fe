@@ -210,5 +210,8 @@
   "members": "Mitglieder",
   "comments": "Kommentare",
   "comment": "Kommentar",
-  "language": "Sprache"
+  "language": "Sprache",
+  "addedTaskAttachment": "Anhang/Anhänge zur Aufgabe hinzugefügt",
+  "subTaskDelete": "Unteraufgabe gelöscht",
+  "subTaskUnDelete": "Unteraufgabe wiederhergestellt"
 }

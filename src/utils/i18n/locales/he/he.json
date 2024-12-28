@@ -210,5 +210,8 @@
   "members": "חברים",
   "comments": "הערות",
   "comment": "הערה",
-  "language": "שפה"
+  "language": "שפה",
+  "addedTaskAttachment": "נוסף קובץ(ים) למשימה",
+  "subTaskDelete": "תת-משימה נמחקה",
+  "subTaskUnDelete": "תת-משימה שוחזרה"
 }

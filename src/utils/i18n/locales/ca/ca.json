@@ -210,5 +210,8 @@
   "members": "Membres",
   "comments": "Comentaris",
   "comment": "Comentari",
-  "language": "Llengua"
+  "language": "Llengua",
+  "addedTaskAttachment": "S'han afegit fitxers adjunts a la tasca",
+  "subTaskDelete": "S'ha eliminat una subtasca",
+  "subTaskUnDelete": "S'ha restaurat una subtasca"
 }

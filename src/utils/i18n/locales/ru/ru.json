@@ -210,7 +210,8 @@
   "members": "Участники",
   "comments": "Комментарии",
   "comment": "Комментарий",
-  "language": "Язык"
-
-
+  "language": "Язык",
+  "addedTaskAttachment": "Добавлено вложение(я) к задаче",
+  "subTaskDelete": "Подзадача удалена",
+  "subTaskUnDelete": "Подзадача восстановлена"
 }

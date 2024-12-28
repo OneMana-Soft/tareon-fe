@@ -210,5 +210,8 @@
   "members": "Μέλη",
   "comments": "Σχόλια",
   "comment": "Σχόλιο",
-  "language": "Γλώσσα"
+  "language": "Γλώσσα",
+  "addedTaskAttachment": "Προστέθηκαν συνημμένα στην εργασία",
+  "subTaskDelete": "Διαγράφηκε υποεργασία",
+  "subTaskUnDelete": "Επαναφέρθηκε υποεργασία"
 }

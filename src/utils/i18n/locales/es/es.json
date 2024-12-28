@@ -210,5 +210,8 @@
   "members": "Miembros",
   "comments": "Comentarios",
   "comment": "Comentario",
-  "language": "Idioma"
+  "language": "Idioma",
+  "addedTaskAttachment": "Se añadieron adjuntos a la tarea",
+  "subTaskDelete": "Se eliminó la subtarea",
+  "subTaskUnDelete": "Se restauró la subtarea"
 }

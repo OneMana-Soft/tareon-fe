@@ -54,26 +54,36 @@ const LoginPage: React.FC = () => {
         <div className="relative hidden h-[100vh] flex-col bg-muted p-10 text-white dark:border-r lg:flex">
             <div className="absolute inset-0 dark:bg-zinc-900 bg-sky-900"/>
             <div className="relative z-20 flex items-center text-lg font-medium">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="mr-2 h-6 w-6"
-                >
-                    <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/>
+                <svg width="69" height="92" viewBox="0 0 69 92" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-10">
+                    <g filter="url(#filter0_d_474_1771)">
+                        <path
+                            d="M65 0.673588C24 24.1736 37 83.6736 37 83.6736C22.1558 60.6736 48.5 15.1736 4.5 27.5C4.5 27.5 50.974 6.96485 65 0.673588Z"
+                            fill="currentColor"/>
+                    </g>
+                    <defs>
+                        <filter id="filter0_d_474_1771" x="0.5" y="0.673584" width="68.5" height="91"
+                                filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                            <feColorMatrix in="SourceAlpha" type="matrix"
+                                           values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                            <feOffset dy="4"/>
+                            <feGaussianBlur stdDeviation="2"/>
+                            <feComposite in2="hardAlpha" operator="out"/>
+                            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+                            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_474_1771"/>
+                            <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_474_1771" result="shape"/>
+                        </filter>
+                    </defs>
                 </svg>
-                Asana Inc
+
+
+                Tareon
             </div>
             <div className="relative z-20 mt-auto">
                 <blockquote className="space-y-2">
                     <p className="text-lg">
-                        &ldquo;Kuch to kar le.&rdquo;
+                        &ldquo;Task management, simplified and yours forever.&rdquo;
                     </p>
-                    <footer className="text-sm">- your parents</footer>
                 </blockquote>
             </div>
         </div>

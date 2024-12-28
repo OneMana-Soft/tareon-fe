@@ -6,6 +6,7 @@ import useSWR from "swr";
 import { ProjectInfoInterface } from "@/services/ProjectService.ts";
 
 export interface TeamInfoInterface {
+  id: string
   uid: string;
   team_uuid: string;
   team_name: string;

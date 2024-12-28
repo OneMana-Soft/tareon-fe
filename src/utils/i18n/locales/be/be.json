@@ -210,6 +210,8 @@
   "members": "Удзельнікі",
   "comments": "Каментары",
   "comment": "Каментар",
-  "language": "Мова"
-
+  "language": "Мова",
+  "addedTaskAttachment": "Дададзена ўкладанне(і) да задачы",
+  "subTaskDelete": "Выдалена падзадача",
+  "subTaskUnDelete": "Адноўлена падзадача"
 }

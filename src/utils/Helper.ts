@@ -64,6 +64,7 @@ export function formatDateFortPost(dateString: string): string {
 }
 
 export function removeHtmlTags(htmlString: string): string {
+  if(!htmlString) return ""
   return htmlString.replace(/<[^>]*>/g, "");
 }
 
@@ -269,6 +270,7 @@ export function GetTaskStatusQueryParamByStatus({
                                                   status = '',
                                                   priorityFilter = [],
                                                   projectFilter = [],
+                                                  assigneeFilter = [],
                                                   pageSize = 0,
                                                   pageIndex = 0,
                                                   getOverdue = false,
@@ -279,6 +281,7 @@ export function GetTaskStatusQueryParamByStatus({
   status?: string;
   priorityFilter?: string[];
   projectFilter?: string[];
+  assigneeFilter?: string[];
   pageSize?: number;
   pageIndex?: number;
   getOverdue?: boolean;
@@ -296,6 +299,10 @@ export function GetTaskStatusQueryParamByStatus({
   }
   if(projectFilter.length > 0) {
     queryString.push({"id":"task_project_name","value":projectFilter})
+  }
+
+  if(assigneeFilter.length > 0) {
+    queryString.push({"id":"task_assignee_name","value":assigneeFilter})
   }
 
   if(getOverdue) {

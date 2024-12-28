@@ -210,6 +210,9 @@
   "members": "सदस्य",
   "comments": "टिप्पणियाँ",
   "comment": "टिप्पणी",
-  "language": "भाषा"
+  "language": "भाषा",
+  "addedTaskAttachment": "कार्य में अटैचमेंट जोड़े गए",
+  "subTaskDelete": "उप-कार्य हटाया गया",
+  "subTaskUnDelete": "उप-कार्य पुनर्स्थापित किया गया"
 
 }

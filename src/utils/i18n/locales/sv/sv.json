@@ -210,6 +210,8 @@
   "members": "Medlemmar",
   "comments": "Kommentarer",
   "comment": "Kommentar",
-  "language": "Språk"
-
+  "language": "Språk",
+  "addedTaskAttachment": "Bilagor tillagda till uppgiften",
+  "subTaskDelete": "Underuppgift borttagen",
+  "subTaskUnDelete": "Underuppgift återställd"
 }

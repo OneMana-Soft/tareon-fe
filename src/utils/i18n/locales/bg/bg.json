@@ -210,6 +210,9 @@
   "members": "Членове",
   "comments": "Коментари",
   "comment": "Коментар",
-  "language": "Език"
+  "language": "Език",
+  "addedTaskAttachment": "Добавени прикачени файлове към задачата",
+  "subTaskDelete": "Изтрита подзадача",
+  "subTaskUnDelete": "Възстановена подзадача"
 
 }

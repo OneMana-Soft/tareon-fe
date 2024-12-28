@@ -210,6 +210,8 @@
   "members": "Members",
   "comments": "Comments",
   "comment": "Comment",
-  "language": "Language"
-
+  "language": "Language",
+  "addedTaskAttachment": "Added attachment(s) to task",
+  "subTaskDelete": "Deleted sub task",
+  "subTaskUnDelete": "Undeleted sub task"
 }

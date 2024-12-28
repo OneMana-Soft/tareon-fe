@@ -210,7 +210,9 @@
   "members": "Leden",
   "comments": "Opmerkingen",
   "comment": "Opmerking",
-  "language": "Taal"
-
+  "language": "Taal",
+  "addedTaskAttachment": "Bijlage(n) toegevoegd aan taak",
+  "subTaskDelete": "Subtaak verwijderd",
+  "subTaskUnDelete": "Subtaak hersteld"
 
 }

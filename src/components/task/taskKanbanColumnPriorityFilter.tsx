@@ -1,7 +1,6 @@
-import {ListFilter} from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
-import {CheckIcon} from "@radix-ui/react-icons";
+import {CheckIcon, PlusCircledIcon} from "@radix-ui/react-icons";
 import {
     Command,
     CommandEmpty,
@@ -14,6 +13,8 @@ import {
 import {cn} from "@/lib/utils.ts";
 import {priorities} from "@/components/task/data.tsx";
 import {useTranslation} from "react-i18next";
+import {Separator} from "@/components/ui/separator.tsx";
+import {Badge} from "@/components/ui/badge.tsx";
 
 type TaskCardProps = {
     activeList: string[];
@@ -28,8 +29,42 @@ export function TaskKanbanColumnPriorityFilter({ activeList, updateList}: TaskCa
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button size='icon' variant={'ghost'}>
-                    <ListFilter />
+                <Button variant="outline" size="sm" className="h-8 border-dashed">
+                    <PlusCircledIcon className="mr-2 h-4 w-4" />
+                    {t('priorities')}
+                    {activeList.length > 0 && (
+                        <>
+                            <Separator orientation="vertical" className="mx-2 h-4" />
+                            <Badge
+                                variant="secondary"
+                                className="rounded-sm px-1 font-normal lg:hidden"
+                            >
+                                {activeList.length}
+                            </Badge>
+                            <div className="hidden space-x-1 lg:flex">
+                                {activeList.length > 2 ? (
+                                    <Badge
+                                        variant="secondary"
+                                        className="rounded-sm px-1 font-normal"
+                                    >
+                                        {activeList.length} selected
+                                    </Badge>
+                                ) :  (
+                                    priorities
+                                        .filter((option) => activeList.includes(option.value))
+                                        .map((option) => (
+                                            <Badge
+                                                variant="secondary"
+                                                key={option.value}
+                                                className="rounded-sm px-1 font-normal"
+                                            >
+                                                {option.label}
+                                            </Badge>
+                                        ))
+                                )}
+                            </div>
+                        </>
+                    )}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0" align="start">

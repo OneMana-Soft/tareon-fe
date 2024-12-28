@@ -210,5 +210,8 @@
   "members": "Jäsenet",
   "comments": "Kommentit",
   "comment": "Kommentti",
-  "language": "Kieli"
+  "language": "Kieli",
+  "addedTaskAttachment": "Liitetiedostot lisätty tehtävään",
+  "subTaskDelete": "Alitehtävä poistettu",
+  "subTaskUnDelete": "Alitehtävä palautettu"
 }

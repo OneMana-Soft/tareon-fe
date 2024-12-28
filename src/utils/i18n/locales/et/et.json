@@ -210,5 +210,8 @@
   "members": "Liikmed",
   "comments": "Kommentaarid",
   "comment": "Kommentaar",
-  "language": "Keel"
+  "language": "Keel",
+  "addedTaskAttachment": "Lisatud manused ülesandele",
+  "subTaskDelete": "Alamülesanne kustutatud",
+  "subTaskUnDelete": "Alamülesanne taastatud"
 }

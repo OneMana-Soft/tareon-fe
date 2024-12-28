@@ -11,7 +11,7 @@ const TaskPage: React.FC = () => {
 
   return (
     <>
-      <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
+      <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex overflow-x-auto">
         <div className="flex items-center justify-between space-y-2">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">{t('myTasks')}</h2>
@@ -22,7 +22,7 @@ const TaskPage: React.FC = () => {
         </div>
 
 
-        <Tabs defaultValue="list" className="w-full ">
+        <Tabs defaultValue="list" className="w-full overflow ">
           <TabsList>
             <TabsTrigger value="list">
               <List className='h-4 w-4 mr-2'/>{t('list')}
@@ -32,7 +32,7 @@ const TaskPage: React.FC = () => {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="list" className='p-4'><MyTaskTable/></TabsContent>
-          <TabsContent value="kanban" className='p-4'><MyTaskKanban/></TabsContent>
+          <TabsContent value="kanban" className='p-4 overflow'><MyTaskKanban/></TabsContent>
         </Tabs>
 
 

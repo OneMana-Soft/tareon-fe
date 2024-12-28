@@ -210,6 +210,8 @@
   "members": "Členové",
   "comments": "Komentáře",
   "comment": "Komentář",
-  "language": "Jazyk"
-
+  "language": "Jazyk",
+  "addedTaskAttachment": "Přidány přílohy k úkolu",
+  "subTaskDelete": "Odstraněný podúkol",
+  "subTaskUnDelete": "Obnovený podúkol"
 }

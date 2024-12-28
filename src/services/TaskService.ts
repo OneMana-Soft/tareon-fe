@@ -50,6 +50,7 @@ export interface TaskActivityInterface {
 
 export interface TaskInfoInterface {
   uid: string;
+  id: string;
   task_uuid: string;
   task_name: string;
   task_priority: string;

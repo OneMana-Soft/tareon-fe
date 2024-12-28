@@ -210,6 +210,9 @@
   "members": "メンバー",
   "comments": "コメント",
   "comment": "コメント",
-  "language": "言語"
+  "language": "言語",
+  "addedTaskAttachment": "タスクに添付ファイルを追加しました",
+  "subTaskDelete": "サブタスクを削除しました",
+  "subTaskUnDelete": "サブタスクを復元しました"
 
 }

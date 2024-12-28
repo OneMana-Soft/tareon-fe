@@ -210,5 +210,8 @@
   "members": "Membri",
   "comments": "Commenti",
   "comment": "Commento",
-  "language": "Lingua"
+  "language": "Lingua",
+  "addedTaskAttachment": "Aggiunto/i allegato/i al compito",
+  "subTaskDelete": "Sotto-attività eliminata",
+  "subTaskUnDelete": "Sotto-attività ripristinata"
 }
