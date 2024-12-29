@@ -11,11 +11,11 @@ import {useTranslation} from "react-i18next";
 
 interface AddTeamMemberComboboxPropInterface {
     handleAddMember: (id: string) => void
+    teamId: string
 }
 
-const AddTeamMemberCombobox: React.FC<AddTeamMemberComboboxPropInterface> = ({handleAddMember}) => {
+const AddTeamMemberCombobox: React.FC<AddTeamMemberComboboxPropInterface> = ({handleAddMember, teamId}) => {
 
-    const {teamId} = useParams()
     const {t} = useTranslation()
 
     const [open, setOpen] = useState(false)
