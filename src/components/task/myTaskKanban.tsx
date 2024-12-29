@@ -359,6 +359,8 @@ export const MyTaskKanban = ({
                         done: taskDoneInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
                         canceled: taskCanceledInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
                     }))
+
+                setClonedItems(items)
             }
 
 
