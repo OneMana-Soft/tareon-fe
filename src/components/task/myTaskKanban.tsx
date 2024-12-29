@@ -346,20 +346,23 @@ export const MyTaskKanban = ({
     }, [items]);
 
 
+    const isLoading = taskBacklogInfo.isLoading || taskTodoInfo.isLoading || taskInProgressInfo.isLoading || taskDoneInfo.isLoading || taskCanceledInfo.isLoading
 
     useEffect(() => {
 
-            setItems( () =>
-                ({
-                    backlog: taskBacklogInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
-                    todo: taskTodoInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
-                    inProgress: taskInProgressInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
-                    done: taskDoneInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
-                    canceled: taskCanceledInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
-                }))
+            if(!isLoading) {
+                setItems( () =>
+                    ({
+                        backlog: taskBacklogInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
+                        todo: taskTodoInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
+                        inProgress: taskInProgressInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
+                        done: taskDoneInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
+                        canceled: taskCanceledInfo.taskData?.data.user_tasks || [] as TaskInfoInterface[],
+                    }))
+            }
 
 
-    }, [taskBacklogInfo.taskData?.data.user_tasks, taskTodoInfo.taskData?.data.user_tasks, taskInProgressInfo.taskData?.data.user_tasks, taskDoneInfo.taskData?.data.user_tasks,  taskCanceledInfo.taskData?.data.user_tasks]);
+    }, [isLoading, taskBacklogInfo.taskData?.data.user_tasks, taskTodoInfo.taskData?.data.user_tasks, taskInProgressInfo.taskData?.data.user_tasks, taskDoneInfo.taskData?.data.user_tasks,  taskCanceledInfo.taskData?.data.user_tasks]);
 
 
     function renderSortableItemDragOverlay(id: UniqueIdentifier) {
