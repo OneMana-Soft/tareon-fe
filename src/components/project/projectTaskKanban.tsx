@@ -80,7 +80,7 @@ export const ProjectTaskKanban = ({
         done: true
     });
     const projectInfo = projectService.getProjectInfo(projectId);
-    const isAdmin = projectInfo.projectData?.data.project_is_admin || false;
+    const isAdmin = projectInfo.projectData?.data.project_is_admin !== undefined ? projectInfo.projectData?.data.project_is_admin : true;
 
 
 

@@ -555,7 +555,7 @@ export const MyTaskKanban = ({
                         }}
                         onDragStart={({active}) => {
                             const t = active.data.current?.task as TaskInfoInterface
-                            if(t && !(t.task_project.project_is_admin)) return
+                            if(t && t.task_project.project_is_admin!== undefined && !(t.task_project.project_is_admin)) return
 
                             setActiveTask(active.data.current?.task as TaskInfoInterface);
 
@@ -565,7 +565,7 @@ export const MyTaskKanban = ({
                         onDragOver={({active, over}) => {
                             const overId = over?.id;
                             const t = active.data.current?.task as TaskInfoInterface
-                            if(t && !(t.task_project.project_is_admin)) return
+                            if(t && t.task_project.project_is_admin!== undefined && !(t.task_project.project_is_admin)) return
 
                             if (overId == null || overId === TRASH_ID || active.id in items) {
                                 return;
