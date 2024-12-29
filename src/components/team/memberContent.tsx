@@ -103,7 +103,7 @@ const MemberContent: React.FC<memberContentProp> = ({teamId, isAdmin}) => {
 
     return (
         <div className='flex flex-col gap-y-6'>
-            <AddTeamMemberCombobox handleAddMember={handleAddMember}/>
+            <AddTeamMemberCombobox handleAddMember={handleAddMember} teamId={teamId}/>
             <MemberList isAdmin={isAdmin} usersList={teamMemberList.teamData?.data.team_members || []}
                         handleMakeAdmin={handleMakeAdmin} handleRemoveAdmin={handleRemoveAdmin}
                         handleRemoveMember={handleRemoveMember}/>

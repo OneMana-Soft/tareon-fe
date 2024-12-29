@@ -1,4 +1,3 @@
-import {useParams} from "react-router-dom";
 import {useState} from "react";
 import {Check, ChevronsUpDown} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
